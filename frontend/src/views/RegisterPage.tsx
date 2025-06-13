@@ -25,7 +25,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <Card title="Register" style={{ maxWidth: 400, margin: "auto" }}>
+    <Card title="Register" style={{ maxWidth: "50%", margin: "auto" }}>
       <Form
         name="register"
         onFinish={onFinish}

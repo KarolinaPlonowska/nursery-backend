@@ -9,18 +9,28 @@ import AdminDashboard from "./views/AdminDashboard";
 import ParentDashboard from "./views/ParentDashboard";
 import CaregiverDashboard from "./views/CaregiverDashboard";
 import PrivateRoute from "./components/PrivateRoute";
-import { logout } from "./utils/auth";
+import { logout, getUserRole } from "./utils/auth";
 
 const { Header, Content, Footer } = Layout;
 
 export default function App() {
   const navigate = useNavigate();
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ width: "100%", minHeight: "100%" }}>
       <Header>
         <Menu theme="dark" mode="horizontal" selectable={false}>
-          <Menu.Item key="home" icon={<HomeOutlined />}>
-            <Link to="/">Home</Link>
+          <Menu.Item
+            key="home"
+            icon={<HomeOutlined />}
+            onClick={() => {
+              const role = getUserRole();
+              if (role === "ADMIN") navigate("/admin");
+              else if (role === "PARENT") navigate("/parent");
+              else if (role === "CAREGIVER") navigate("/caregiver");
+              else navigate("/login");
+            }}
+          >
+            Home
           </Menu.Item>
           <Menu.Item key="login" icon={<LoginOutlined />}>
             <Link to="/login">Login</Link>

@@ -9,9 +9,11 @@ const API_URL = "http://localhost:3000";
 export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const onFinish = async (values: any) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await axios.post(`${API_URL}/auth/login`, values);
       localStorage.setItem("token", res.data.access_token);
@@ -21,6 +23,7 @@ export default function LoginPage() {
       else if (payload.role === "CAREGIVER") navigate("/caregiver");
       else navigate("/");
     } catch (err: any) {
+      setError(err?.response?.data?.message || "Login failed");
       message.error(err?.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
@@ -28,7 +31,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card title="Login" style={{ maxWidth: 400, margin: "auto" }}>
+    <Card title="Login" style={{ maxWidth: "50%", margin: "auto" }}>
       <Form
         name="login"
         onFinish={onFinish}
@@ -64,6 +67,11 @@ export default function LoginPage() {
           </Button>
         </Form.Item>
       </Form>
+      {error && (
+        <div style={{ color: "red", marginTop: 16, textAlign: "center" }}>
+          {error}
+        </div>
+      )}
     </Card>
   );
 }

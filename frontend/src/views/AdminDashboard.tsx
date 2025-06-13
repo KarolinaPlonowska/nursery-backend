@@ -151,11 +151,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       </Header>
       <Content
         style={{
-          maxWidth: 1200,
+          //maxWidth: 1200,
           margin: "96px auto 32px auto", // 96px top margin for fixed nav
           width: "100%",
           padding: "0 16px",
-          transition: "max-width 0.2s",
+          //transition: "max-width 0.2s",
         }}
       >
         {activeTab === "users" && (
@@ -202,7 +202,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 {
                   title: "Grupa",
                   dataIndex: ["group", "name"],
-                  render: (text, record) => record.group?.name || "-",
+                  render: (_: any, record: any) => record.group?.name || "-",
                 },
               ]}
             />
