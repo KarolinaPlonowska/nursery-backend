@@ -36,6 +36,20 @@ export default function RegisterPage() {
         }
       >
         <Form.Item
+          name="firstName"
+          label="First Name"
+          rules={[{ required: true, message: "Please input your first name!" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="lastName"
+          label="Last Name"
+          rules={[{ required: true, message: "Please input your last name!" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
           name="email"
           label="Email"
           rules={[
@@ -67,7 +81,6 @@ export default function RegisterPage() {
           rules={[{ required: true, message: "Please select a role!" }]}
         >
           <Select placeholder="Select a role">
-            <Option value="ADMIN">Admin</Option>
             <Option value="PARENT">Parent</Option>
             <Option value="CAREGIVER">Caregiver</Option>
           </Select>

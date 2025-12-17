@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, Table, Select, Button, Form, message, Layout, Menu } from "antd";
+import { Card, Table, Select, Button, Form, Input, message, Layout, Menu } from "antd";
 import {
   UserOutlined,
   TeamOutlined,
@@ -27,33 +27,43 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [selectedChild, setSelectedChild] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("users");
+  const [editingGroup, setEditingGroup] = useState<any | null>(null);
+  const [groupForm] = Form.useForm();
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+  const [adminForm] = Form.useForm();
+  const [showInviteCode, setShowInviteCode] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = getToken();
+      const [usersRes, childrenRes, groupsRes] = await Promise.all([
+        axios.get(`${API_URL}/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${API_URL}/children`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${API_URL}/groups`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+      setUsers(usersRes.data);
+      setChildren(childrenRes.data);
+      setGroups(groupsRes.data);
+      
+      // Update invite code visibility
+      const adminCount = usersRes.data.filter((u: any) => u.role === 'ADMIN').length;
+      setShowInviteCode(adminCount === 0);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = getToken();
-        const [usersRes, childrenRes, groupsRes] = await Promise.all([
-          axios.get(`${API_URL}/users`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${API_URL}/children`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${API_URL}/groups`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-        setUsers(usersRes.data);
-        setChildren(childrenRes.data);
-        setGroups(groupsRes.data);
-      } catch (err: any) {
-        setError(err?.response?.data?.message || "Failed to fetch data");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -77,6 +87,23 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     }
   };
 
+  const handleVerifyEmail = async (userId: string) => {
+    try {
+      const token = getToken();
+      await axios.patch(
+        `${API_URL}/users/${userId}/verify-email`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, emailVerified: true } : u))
+      );
+      message.success("Email zweryfikowany");
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || "Błąd weryfikacji");
+    }
+  };
+
   const handleAssign = async () => {
     if (!selectedChild || !selectedGroup) return;
     setAssigning(true);
@@ -87,11 +114,77 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         { childId: selectedChild },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      await fetchData();
       message.success("Child assigned to group");
     } catch (err: any) {
       message.error(err?.response?.data?.message || "Failed to assign child");
     } finally {
       setAssigning(false);
+    }
+  };
+
+  const handleCreateGroup = async (values: any) => {
+    try {
+      const token = getToken();
+      const res = await axios.post(
+        `${API_URL}/groups`,
+        values,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setGroups((prev) => [...prev, res.data]);
+      groupForm.resetFields();
+      message.success("Grupa utworzona");
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || "Błąd tworzenia grupy");
+    }
+  };
+
+  const handleUpdateGroup = async (values: any) => {
+    if (!editingGroup) return;
+    try {
+      const token = getToken();
+      const res = await axios.patch(
+        `${API_URL}/groups/${editingGroup.id}`,
+        values,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setGroups((prev) =>
+        prev.map((g) => (g.id === editingGroup.id ? res.data : g))
+      );
+      setEditingGroup(null);
+      groupForm.resetFields();
+      message.success("Grupa zaktualizowana");
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || "Błąd aktualizacji grupy");
+    }
+  };
+
+  const startEditGroup = (group: any) => {
+    setEditingGroup(group);
+    groupForm.setFieldsValue({ name: group.name });
+  };
+
+  const cancelEditGroup = () => {
+    setEditingGroup(null);
+    groupForm.resetFields();
+  };
+
+  const handleCreateAdminUser = async (values: any) => {
+    setCreatingAdmin(true);
+    try {
+      const token = getToken();
+      await axios.post(
+        `${API_URL}/auth/create-admin`,
+        values,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      message.success("Admin account created successfully");
+      adminForm.resetFields();
+      await fetchData();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || "Failed to create admin");
+    } finally {
+      setCreatingAdmin(false);
     }
   };
 
@@ -169,6 +262,16 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               columns={[
                 { title: "Email", dataIndex: "email" },
                 {
+                  title: "Imię i nazwisko",
+                  render: (_: any, record: any) =>
+                    `${record.firstName || "-"} ${record.lastName || "-"}`,
+                },
+                {
+                  title: "Email zweryfikowany",
+                  dataIndex: "emailVerified",
+                  render: (verified: boolean) => (verified ? "Tak" : "Nie"),
+                },
+                {
                   title: "Rola",
                   dataIndex: "role",
                   render: (role, record) => (
@@ -185,8 +288,73 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                     </Select>
                   ),
                 },
+                {
+                  title: "Akcje",
+                  render: (_: any, record: any) =>
+                    !record.emailVerified ? (
+                      <Button
+                        size="small"
+                        onClick={() => handleVerifyEmail(record.id)}
+                      >
+                        Zweryfikuj email
+                      </Button>
+                    ) : null,
+                },
               ]}
             />
+            <h3 style={{ marginTop: 32 }}>Utwórz konto administratora</h3>
+            <Form
+              form={adminForm}
+              layout="inline"
+              onFinish={handleCreateAdminUser}
+              style={{ marginBottom: 24 }}
+            >
+              <Form.Item
+                name="firstName"
+                label="Imię"
+                rules={[{ required: true, message: "Podaj imię" }]}
+              >
+                <Input placeholder="Imię" />
+              </Form.Item>
+              <Form.Item
+                name="lastName"
+                label="Nazwisko"
+                rules={[{ required: true, message: "Podaj nazwisko" }]}
+              >
+                <Input placeholder="Nazwisko" />
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { required: true, type: "email", message: "Podaj email" },
+                ]}
+              >
+                <Input placeholder="email@example.com" type="email" />
+              </Form.Item>
+              <Form.Item
+                name="password"
+                label="Hasło"
+                rules={[{ required: true, min: 6, message: "Min. 6 znaków" }]}
+              >
+                <Input.Password placeholder="Min. 6 znaków" />
+              </Form.Item>
+              {showInviteCode && (
+                <Form.Item
+                  name="inviteCode"
+                  label="Kod zaproszenia"
+                  rules={[{ required: true, message: "Podaj kod zaproszenia" }]}
+                  tooltip="Wymagany do utworzenia pierwszego konta administratora"
+                >
+                  <Input placeholder="Kod zaproszenia" />
+                </Form.Item>
+              )}
+              <Form.Item>
+                <Button type="primary" htmlType="submit" loading={creatingAdmin}>
+                  Utwórz administratora
+                </Button>
+              </Form.Item>
+            </Form>
           </div>
         )}
         {activeTab === "children" && (
@@ -198,7 +366,15 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               pagination={false}
               scroll={{ x: true }}
               columns={[
-                { title: "Imię i nazwisko", dataIndex: "name" },
+                {
+                  title: "Imię i nazwisko",
+                  render: (_: any, record: any) =>
+                    `${record.firstName} ${record.lastName}`,
+                },
+                {
+                  title: "Rodzic",
+                  render: (_: any, record: any) => record.parent?.email || "-",
+                },
                 {
                   title: "Grupa",
                   dataIndex: ["group", "name"],
@@ -221,7 +397,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 >
                   {children.map((child) => (
                     <Option key={child.id} value={child.id}>
-                      {child.name}
+                      {`${child.firstName} ${child.lastName}`}
                     </Option>
                   ))}
                 </Select>
@@ -262,10 +438,50 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                   title: "Dzieci",
                   dataIndex: "children",
                   render: (children) =>
-                    children?.map((c: any) => c.name).join(", ") || "-",
+                    children
+                      ?.map((c: any) => `${c.firstName} ${c.lastName}`)
+                      .join(", ") || "-",
+                },
+                {
+                  title: "Akcje",
+                  render: (_: any, record: any) => (
+                    <Button size="small" onClick={() => startEditGroup(record)}>
+                      Edytuj
+                    </Button>
+                  ),
                 },
               ]}
             />
+            <h3 style={{ marginTop: 32 }}>
+              {editingGroup ? "Edytuj grupę" : "Utwórz nową grupę"}
+            </h3>
+            <Form
+              form={groupForm}
+              layout="inline"
+              onFinish={editingGroup ? handleUpdateGroup : handleCreateGroup}
+              style={{ marginBottom: 24 }}
+            >
+              <Form.Item
+                name="name"
+                label="Nazwa grupy"
+                rules={[{ required: true, message: "Podaj nazwę grupy" }]}
+              >
+                <Input placeholder="np. Żabki, Motylki" />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  {editingGroup ? "Zapisz" : "Utwórz"}
+                </Button>
+                {editingGroup && (
+                  <Button
+                    style={{ marginLeft: 8 }}
+                    onClick={cancelEditGroup}
+                  >
+                    Anuluj
+                  </Button>
+                )}
+              </Form.Item>
+            </Form>
           </div>
         )}
       </Content>

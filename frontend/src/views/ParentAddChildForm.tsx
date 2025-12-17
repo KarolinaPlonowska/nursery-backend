@@ -19,7 +19,7 @@ export default function ParentAddChildForm({
         {
           firstName: values.firstName,
           lastName: values.lastName,
-          birthDate: values.birthDate.format("YYYY-MM-DD"),
+          birthDate: values.birthDate?.format("YYYY-MM-DD"),
         },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -59,7 +59,7 @@ export default function ParentAddChildForm({
         label="Data urodzenia"
         rules={[{ required: true, message: "Podaj datę urodzenia" }]}
       >
-        <DatePicker format="YYYY-MM-DD" />{" "}
+        <DatePicker format="YYYY-MM-DD" />
       </Form.Item>
       <Form.Item>
         <Button

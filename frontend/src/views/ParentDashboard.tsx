@@ -16,7 +16,7 @@ export default function ParentDashboard({
   const fetchChildren = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/children`, {
+      const res = await axios.get(`${API_URL}/parents/children`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setChildren(res.data);

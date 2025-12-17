@@ -1,8 +1,9 @@
-import { Routes, Route, Navigate, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import { UserOutlined, LoginOutlined, HomeOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import "./App.css";
+import LandingPage from "./views/LandingPage";
 import LoginPage from "./views/LoginPage";
 import RegisterPage from "./views/RegisterPage";
 import AdminDashboard from "./views/AdminDashboard";
@@ -49,7 +50,7 @@ export default function App() {
       </Header>
       <Content style={{ padding: "2rem" }}>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route
