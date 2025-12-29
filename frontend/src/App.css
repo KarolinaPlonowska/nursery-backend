@@ -42,3 +42,12 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Menu styling for consistent highlight color */
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #7C3AED !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected::after {
+  border-right-color: #7C3AED !important;
+}
