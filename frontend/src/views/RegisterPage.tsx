@@ -138,6 +138,29 @@ export default function RegisterPage() {
           >
             <Input placeholder="email@example.com" size="large" />
           </Form.Item>
+          
+          <Form.Item
+            name="confirmEmail"
+            label={<span style={{ color: "#374151", fontWeight: 500 }}>Potwierdź email</span>}
+            dependencies={['email']}
+            rules={[
+              {
+                required: true,
+                message: "Potwierdź swój email!",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('email') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Adresy email nie są zgodne!'));
+                },
+              }),
+            ]}
+          >
+            <Input placeholder="Wpisz email ponownie" size="large" />
+          </Form.Item>
+          
           <Form.Item
             name="password"
             label={<span style={{ color: "#374151", fontWeight: 500 }}>Hasło (Silne)</span>}

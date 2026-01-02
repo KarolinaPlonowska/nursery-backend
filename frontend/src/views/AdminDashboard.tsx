@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, Table, Select, Button, Form, Input, message, Layout, Menu, DatePicker, Modal } from "antd";
+import { Card, Table, Select, Button, Form, Input, message, Layout, Menu, DatePicker, Modal, Tooltip } from "antd";
 import {
   UserOutlined,
   TeamOutlined,
@@ -7,16 +7,15 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
+import { getUser } from "../utils/auth";
 
 const { Option } = Select;
 const { Header, Content } = Layout;
 const API_URL = "http://localhost:3000";
 
-function getToken() {
-  return localStorage.getItem("token");
-}
-
 export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
+  const currentUser = getUser();
+  const currentUserId = currentUser?.id;
   const [users, setUsers] = useState<any[]>([]);
   const [children, setChildren] = useState<any[]>([]);
   const [groups, setGroups] = useState<any[]>([]);
@@ -57,16 +56,15 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     setLoading(true);
     setError(null);
     try {
-      const token = getToken();
       const [usersRes, childrenRes, groupsRes] = await Promise.all([
         axios.get(`${API_URL}/users`, {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }),
         axios.get(`${API_URL}/children`, {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }),
         axios.get(`${API_URL}/groups`, {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }),
       ]);
       setUsers(usersRes.data);
@@ -90,11 +88,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleRoleChange = async (userId: string, newRole: string) => {
     setRoleUpdating(userId);
     try {
-      const token = getToken();
       await axios.patch(
         `${API_URL}/users/${userId}/role`,
         { role: newRole },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
@@ -109,11 +106,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const handleVerifyEmail = async (userId: string) => {
     try {
-      const token = getToken();
       await axios.patch(
         `${API_URL}/users/${userId}/verify-email`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, emailVerified: true } : u))
@@ -128,11 +124,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     if (!selectedChild || !selectedGroup) return;
     setAssigning(true);
     try {
-      const token = getToken();
       await axios.post(
         `${API_URL}/groups/${selectedGroup}/assign-child`,
         { childId: selectedChild },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       await fetchData();
       message.success("Child assigned to group");
@@ -145,11 +140,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const handleCreateGroup = async (values: any) => {
     try {
-      const token = getToken();
       const res = await axios.post(
         `${API_URL}/groups`,
         values,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       setGroups((prev) => [...prev, res.data]);
       groupForm.resetFields();
@@ -162,11 +156,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleUpdateGroup = async (values: any) => {
     if (!editingGroup) return;
     try {
-      const token = getToken();
       const res = await axios.patch(
         `${API_URL}/groups/${editingGroup.id}`,
         values,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       setGroups((prev) =>
         prev.map((g) => (g.id === editingGroup.id ? res.data : g))
@@ -192,11 +185,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleCreateAdminUser = async (values: any) => {
     setCreatingAdmin(true);
     try {
-      const token = getToken();
       await axios.post(
         `${API_URL}/auth/create-admin`,
         values,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       message.success("Admin account created successfully");
       adminForm.resetFields();
@@ -211,7 +203,6 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleAddChild = async (values: any) => {
     setCreatingChild(true);
     try {
-      const token = getToken();
       await axios.post(
         `${API_URL}/children`,
         {
@@ -221,7 +212,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           parentId: values.parentId || undefined,
           groupId: values.groupId || undefined,
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       message.success("Dodano dziecko!");
       childForm.resetFields();
@@ -236,9 +227,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleDeleteUser = async (userId: string) => {
     setDeletingUser(userId);
     try {
-      const token = getToken();
       await axios.delete(`${API_URL}/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
       });
       setUsers((prev) => prev.filter((u) => u.id !== userId));
       message.success("Użytkownik usunięty");
@@ -251,9 +241,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const handleDeleteChild = async (childId: string) => {
     try {
-      const token = getToken();
       await axios.delete(`${API_URL}/children/${childId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
       });
       message.success('Dziecko usunięte');
       await fetchData();
@@ -265,11 +254,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleSetChildGroup = async (childId: string, groupId: string | null) => {
     setUpdatingChildGroupId(childId);
     try {
-      const token = getToken();
       await axios.patch(
         `${API_URL}/children/${childId}/group`,
         { groupId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       await fetchData();
       message.success(groupId ? 'Zmieniono grupę dziecka' : 'Usunięto dziecko z grupy');
@@ -302,11 +290,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const assignCaregiverToGroup = async (groupId: string, caregiverId: string) => {
     setAssigningCaregiver(groupId);
     try {
-      const token = getToken();
       await axios.post(
         `${API_URL}/groups/${groupId}/assign-caregiver`,
         { caregiverId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       await fetchData();
       message.success('Opiekun przypisany do grupy');
@@ -320,10 +307,9 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleRemoveCaregiver = async (groupId: string) => {
     setAssigningCaregiver(groupId);
     try {
-      const token = getToken();
       await axios.delete(
         `${API_URL}/groups/${groupId}/remove-caregiver`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
       await fetchData();
       message.success('Opiekun usunięty z grupy');
@@ -454,29 +440,43 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 },
                 {
                   title: "Akcje",
-                  render: (_: any, record: any) =>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      {!record.emailVerified && (
-                        <Button
-                          size="small"
-                          onClick={() => handleVerifyEmail(record.id)}
-                        >
-                          Zweryfikuj email
-                        </Button>
-                      )}
-                      <Button
-                        size="small"
-                        danger
-                        loading={deletingUser === record.id}
-                        disabled={deletingUser === record.id}
-                        onClick={() => {
-                          setConfirmDeleteUser(record.id);
-                          setUserToDeleteEmail(record.email);
-                        }}
-                      >
-                        Usuń użytkownika
-                      </Button>
-                    </div>,
+                  render: (_: any, record: any) => {
+                    const isSelf = record.id === currentUserId;
+                    const isAdmin = record.role === 'ADMIN';
+                    const canDelete = !isSelf && !isAdmin;
+                    const deleteTooltip = isSelf 
+                      ? "Nie możesz usunąć swojego własnego konta" 
+                      : isAdmin 
+                        ? "Nie możesz usunąć konta administratora" 
+                        : "";
+                    
+                    return (
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {!record.emailVerified && (
+                          <Button
+                            size="small"
+                            onClick={() => handleVerifyEmail(record.id)}
+                          >
+                            Zweryfikuj email
+                          </Button>
+                        )}
+                        <Tooltip title={deleteTooltip}>
+                          <Button
+                            size="small"
+                            danger
+                            loading={deletingUser === record.id}
+                            disabled={!canDelete || deletingUser === record.id}
+                            onClick={() => {
+                              setConfirmDeleteUser(record.id);
+                              setUserToDeleteEmail(record.email);
+                            }}
+                          >
+                            Usuń użytkownika
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    );
+                  },
                 },
               ]}
             />

@@ -7,19 +7,20 @@ import LandingPage from "./views/LandingPage";
 import LoginPage from "./views/LoginPage";
 import RegisterPage from "./views/RegisterPage";
 import VerifyEmailPage from "./views/VerifyEmailPage";
+import ForgotPasswordPage from "./views/ForgotPasswordPage";
 import AdminDashboard from "./views/AdminDashboard";
 import ParentDashboard from "./views/ParentDashboard";
 import CaregiverDashboard from "./views/CaregiverDashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import { logout, getUserRole, getToken } from "./utils/auth";
 
-const { Header, Content, Footer } = Layout;
+  const { Header, Content, Footer } = Layout;
 
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/verify-email";
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/verify-email" || location.pathname === "/forgot-password";
   const isLoggedIn = !!getToken();
   const userRole = getUserRole();
 
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route
             path="/admin"
             element={

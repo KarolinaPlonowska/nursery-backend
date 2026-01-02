@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, Form, Input, Button, message, Divider } from "antd";
 import { LoginOutlined, HomeOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { setUser } from "../utils/auth";
 
 const API_URL = "http://localhost:3000";
 
@@ -15,12 +16,17 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, values);
-      localStorage.setItem("token", res.data.access_token);
-      const payload = JSON.parse(atob(res.data.access_token.split(".")[1]));
-      if (payload.role === "ADMIN") navigate("/admin");
-      else if (payload.role === "PARENT") navigate("/parent");
-      else if (payload.role === "CAREGIVER") navigate("/caregiver");
+      const res = await axios.post(`${API_URL}/auth/login`, values, {
+        withCredentials: true, // Istotne - wysłanie cookies
+      });
+      
+      // Przechowaj dane użytkownika w sessionStorage
+      setUser(res.data.user, res.data.user.role);
+      
+      // Nawiguj na podstawie roli
+      if (res.data.user.role === "ADMIN") navigate("/admin");
+      else if (res.data.user.role === "PARENT") navigate("/parent");
+      else if (res.data.user.role === "CAREGIVER") navigate("/caregiver");
       else navigate("/");
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
@@ -90,6 +96,16 @@ export default function LoginPage() {
         )}
 
         <Divider style={{ margin: "24px 0", borderColor: "#E5E7EB" }} />
+
+        <div style={{ textAlign: "center", marginBottom: 16 }}>
+          <Button
+            type="link"
+            onClick={() => navigate("/forgot-password")}
+            style={{ color: "#7C3AED", fontWeight: 500, padding: 0, fontSize: 14 }}
+          >
+            Zapomniałeś hasła?
+          </Button>
+        </div>
 
         <div style={{ textAlign: "center" }}>
           <p style={{ color: "#6B7280", marginBottom: 12 }}>Nie masz konta?</p>

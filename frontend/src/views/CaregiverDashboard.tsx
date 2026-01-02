@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, Button, Table, message, Collapse } from "antd";
 import axios from "axios";
-import { getUser } from "../utils/auth";
 
 const { Panel } = Collapse;
 const API_URL = "http://localhost:3000";
@@ -19,7 +18,7 @@ export default function CaregiverDashboard({
       setLoading(true);
       try {
         const res = await axios.get(`${API_URL}/groups/my-groups`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          withCredentials: true,
         });
         setGroups(res.data);
       } catch (err: any) {
