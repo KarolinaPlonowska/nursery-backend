@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Card, Form, Input, Button, message, Alert, Spin } from "antd";
 import { CheckCircleOutlined, MailOutlined, HomeOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { useTheme } from "../hooks/useTheme";
 
 const API_URL = "http://localhost:3000";
 
@@ -13,12 +14,22 @@ export default function VerifyEmailPage() {
   const [resending, setResending] = useState(false);
   const [verified, setVerified] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const email = location.state?.email;
 
   if (!email) {
     return (
-      <div style={{ minHeight: "100vh", background: "#F9FAFB", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+      <div style={{ 
+        minHeight: "100vh", 
+        background: isDark ? "#0f0f0f" : "#F9FAFB", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        padding: "20px",
+        transition: "background-color 0.3s ease"
+      }}>
         <Card style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
           <p style={{ color: "#6B7280" }}>Brak danych weryfikacyjnych. Wróć do strony głównej.</p>
           <Button
@@ -80,13 +91,21 @@ export default function VerifyEmailPage() {
 
   if (verified) {
     return (
-      <div style={{ minHeight: "100vh", background: "#F9FAFB", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+      <div style={{ 
+        minHeight: "100vh", 
+        background: isDark ? "#0f0f0f" : "#F9FAFB", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        padding: "20px",
+        transition: "background-color 0.3s ease"
+      }}>
         <Card style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
           <div style={{ fontSize: 60, color: "#10B981", marginBottom: 16 }}>
             <CheckCircleOutlined />
           </div>
-          <h1 style={{ fontSize: 24, color: "#1F2937", fontWeight: 700 }}>Gratulacje!</h1>
-          <p style={{ color: "#6B7280", marginTop: 8 }}>
+          <h1 style={{ fontSize: 24, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700 }}>Gratulacje!</h1>
+          <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginTop: 8 }}>
             Email zweryfikowany pomyślnie. Zostaniesz przekierowany do logowania...
           </p>
           <Spin />
@@ -96,7 +115,15 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F9FAFB", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+    <div style={{ 
+      minHeight: "100vh", 
+      background: isDark ? "#0f0f0f" : "#F9FAFB", 
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      padding: "20px",
+      transition: "background-color 0.3s ease"
+    }}>
       <Card
         style={{
           width: "100%",

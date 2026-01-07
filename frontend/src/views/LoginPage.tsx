@@ -4,6 +4,7 @@ import { Card, Form, Input, Button, message, Divider } from "antd";
 import { LoginOutlined, HomeOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { setUser } from "../utils/auth";
+import { useTheme } from "../hooks/useTheme";
 
 const API_URL = "http://localhost:3000";
 
@@ -11,6 +12,9 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useTheme();
+  
+  const isDark = theme === 'dark';
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -37,7 +41,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F9FAFB", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+    <div style={{ 
+      minHeight: "100vh", 
+      background: isDark ? "#0f0f0f" : "#F9FAFB", 
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      padding: "20px",
+      transition: "background-color 0.3s ease"
+    }}>
       <Card 
         style={{ 
           width: "100%", 
@@ -49,8 +61,8 @@ export default function LoginPage() {
       >
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <LoginOutlined style={{ fontSize: 40, color: "#7C3AED", marginBottom: 16 }} />
-          <h1 style={{ fontSize: 28, color: "#1F2937", fontWeight: 700, margin: 0 }}>Zaloguj się</h1>
-          <p style={{ color: "#6B7280", marginTop: 8 }}>Dostęp do systemu zarządzania przedszkolem</p>
+          <h1 style={{ fontSize: 28, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700, margin: 0 }}>Zaloguj się</h1>
+          <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginTop: 8 }}>Dostęp do systemu zarządzania przedszkolem</p>
         </div>
 
         <Form
@@ -62,14 +74,14 @@ export default function LoginPage() {
         >
           <Form.Item
             name="email"
-            label={<span style={{ color: "#374151", fontWeight: 500 }}>Email</span>}
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Email</span>}
             rules={[{ required: true, message: "Podaj email!" }]}
           >
             <Input placeholder="email@example.com" size="large" />
           </Form.Item>
           <Form.Item
             name="password"
-            label={<span style={{ color: "#374151", fontWeight: 500 }}>Hasło</span>}
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Hasło</span>}
             rules={[{ required: true, message: "Podaj hasło!" }]}
           >
             <Input.Password placeholder="••••••••" size="large" />
@@ -108,7 +120,7 @@ export default function LoginPage() {
         </div>
 
         <div style={{ textAlign: "center" }}>
-          <p style={{ color: "#6B7280", marginBottom: 12 }}>Nie masz konta?</p>
+          <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginBottom: 12 }}>Nie masz konta?</p>
           <Button
             type="default"
             block

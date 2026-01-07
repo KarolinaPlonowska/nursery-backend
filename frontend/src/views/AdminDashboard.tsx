@@ -5,9 +5,12 @@ import {
   TeamOutlined,
   AppstoreOutlined,
   LogoutOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
+import { useTheme } from "../hooks/useTheme";
+import SettingsPage from "./SettingsPage";
 
 const { Option } = Select;
 const { Header, Content } = Layout;
@@ -16,6 +19,8 @@ const API_URL = "http://localhost:3000";
 export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const currentUser = getUser();
   const currentUserId = currentUser?.id;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [users, setUsers] = useState<any[]>([]);
   const [children, setChildren] = useState<any[]>([]);
   const [groups, setGroups] = useState<any[]>([]);
@@ -330,17 +335,17 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     );
 
   return (
-    <Layout style={{ background: "#F9FAFB", minHeight: "100vh" }}>
+    <Layout style={{ background: isDark ? "linear-gradient(180deg, #0f0a1a 0%, #141414 50%, #0f0a1a 100%)" : "#F9FAFB", minHeight: "100vh", transition: "background-color 0.3s ease" }}>
       <Header
         style={{
-          background: "#5B21B6",
+          background: "linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #FBBF24 100%)",
           position: "fixed",
           zIndex: 100,
           width: "100%",
           top: 0,
           left: 0,
           right: 0,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          boxShadow: "0 2px 12px rgba(251,191,36,0.3)",
           padding: 0,
           display: "flex",
           alignItems: "center",
@@ -354,7 +359,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             if (key === "logout") onLogout();
             else setActiveTab(key);
           }}
-          style={{ flex: 1, minWidth: 0, display: "flex", background: "#5B21B6" }}
+          style={{ flex: 1, minWidth: 0, display: "flex", background: "transparent" }}
         >
           <Menu.Item key="users" icon={<UserOutlined />}>
             Użytkownicy
@@ -364,6 +369,9 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </Menu.Item>
           <Menu.Item key="groups" icon={<AppstoreOutlined />}>
             Grupy
+          </Menu.Item>
+          <Menu.Item key="settings" icon={<SettingOutlined />}>
+            Ustawienia
           </Menu.Item>
           <Menu.Item
             key="logout"
@@ -388,28 +396,45 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               style={{
                 marginBottom: 24,
                 borderRadius: 12,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                border: "1px solid #E5E7EB"
+                boxShadow: isDark ? "0 0 20px rgba(251,191,36,0.15), 0 0 40px rgba(124,58,237,0.1)" : "0 2px 8px rgba(0,0,0,0.08)",
+                border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 20, fontWeight: 700, color: "#1F2937" }}>👥 Użytkownicy</span>}
+              title={<span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👥 Użytkownicy</span>}
             >
             <Table
               dataSource={users}
               rowKey="id"
               pagination={false}
               scroll={{ x: true }}
+              onRow={() => ({
+                style: {
+                  transition: 'all 0.3s ease',
+                  cursor: 'default'
+                },
+                onMouseEnter: (e) => {
+                  if (isDark) {
+                    e.currentTarget.style.background = 'rgba(251,191,36,0.08)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(251,191,36,0.2)';
+                  }
+                },
+                onMouseLeave: (e) => {
+                  e.currentTarget.style.background = '';
+                  e.currentTarget.style.boxShadow = '';
+                }
+              })}
               columns={[
-                { title: "Email", dataIndex: "email" },
+                { title: "Email", dataIndex: "email", render: (text: string) => <span style={{ color: isDark ? "#E5E7EB" : "#1F2937", fontWeight: 500 }}>{text}</span> },
                 {
                   title: "Imię i nazwisko",
                   render: (_: any, record: any) =>
-                    <span style={{ fontWeight: 500, color: "#1F2937" }}>{`${record.firstName || "-"} ${record.lastName || "-"}`}</span>,
+                    <span style={{ fontWeight: 600, color: isDark ? "#FBBF24" : "#1F2937" }}>{`${record.firstName || "-"} ${record.lastName || "-"}`}</span>,
                 },
                 {
                   title: "Email zweryfikowany",
                   dataIndex: "emailVerified",
                   render: (verified: boolean) => (
-                    <span style={{ fontWeight: 600, color: verified ? "#16A34A" : "#6B7280" }}>
+                    <span style={{ fontWeight: 600, color: verified ? "#F59E0B" : "#6B7280" }}>
                       {verified ? "✓ Tak" : "✗ Nie"}
                     </span>
                   ),
@@ -485,10 +510,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               style={{
                 marginBottom: 24,
                 borderRadius: 12,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                border: "1px solid #E5E7EB"
+                boxShadow: isDark ? "0 0 20px rgba(251,191,36,0.15), 0 0 40px rgba(124,58,237,0.1)" : "0 2px 8px rgba(0,0,0,0.08)",
+                border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 18, fontWeight: 600, color: "#1F2937" }}>➕ Utwórz konto administratora</span>}
+              title={<span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>➕ Utwórz konto administratora</span>}
             >
             <Form
               form={adminForm}
@@ -536,8 +562,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                   <Input placeholder="Kod zaproszenia" />
                 </Form.Item>
               )}
-              <Form.Item>
-                <Button type="primary" htmlType="submit" loading={creatingAdmin} style={{ background: "#7C3AED", borderColor: "#7C3AED", fontWeight: 600 }}>
+              <Form.Item style={{ marginTop: 32 }}>
+                <Button type="primary" htmlType="submit" loading={creatingAdmin} style={{ background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", border: "none", fontWeight: 600, boxShadow: "0 4px 12px rgba(251,191,36,0.4)" }}>
                   Utwórz administratora
                 </Button>
               </Form.Item>
@@ -551,25 +577,42 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               style={{
                 marginBottom: 24,
                 borderRadius: 12,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                border: "1px solid #E5E7EB"
+                boxShadow: isDark ? "0 0 20px rgba(251,191,36,0.15), 0 0 40px rgba(124,58,237,0.1)" : "0 2px 8px rgba(0,0,0,0.08)",
+                border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 20, fontWeight: 700, color: "#1F2937" }}>👶 Dzieci</span>}
+              title={<span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👶 Dzieci</span>}
             >
             <Table
               dataSource={children}
               rowKey="id"
               pagination={false}
               scroll={{ x: true }}
+              onRow={() => ({
+                style: {
+                  transition: 'all 0.3s ease',
+                  cursor: 'default'
+                },
+                onMouseEnter: (e) => {
+                  if (isDark) {
+                    e.currentTarget.style.background = 'rgba(251,191,36,0.08)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(251,191,36,0.2)';
+                  }
+                },
+                onMouseLeave: (e) => {
+                  e.currentTarget.style.background = '';
+                  e.currentTarget.style.boxShadow = '';
+                }
+              })}
               columns={[
                 {
                   title: "Imię i nazwisko",
                   render: (_: any, record: any) =>
-                    `${record.firstName} ${record.lastName}`,
+                    <span style={{ fontWeight: 600, color: isDark ? "#FBBF24" : "#1F2937" }}>{`${record.firstName} ${record.lastName}`}</span>,
                 },
                 {
                   title: "Rodzic",
-                  render: (_: any, record: any) => record.parent?.email || "-",
+                  render: (_: any, record: any) => <span style={{ color: isDark ? "#E5E7EB" : "#1F2937" }}>{record.parent?.email || "-"}</span>,
                 },
                 {
                   title: "Grupa",
@@ -610,10 +653,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               style={{
                 marginBottom: 24,
                 borderRadius: 12,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                border: "1px solid #E5E7EB"
+                boxShadow: isDark ? "0 0 20px rgba(251,191,36,0.15), 0 0 40px rgba(124,58,237,0.1)" : "0 2px 8px rgba(0,0,0,0.08)",
+                border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 18, fontWeight: 600, color: "#1F2937" }}>➕ Dodaj nowe dziecko</span>}
+              title={<span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>➕ Dodaj nowe dziecko</span>}
             >
             <Form
               form={childForm}
@@ -675,7 +719,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 </Select>
               </Form.Item>
               <Form.Item>
-                <Button type="primary" htmlType="submit" loading={creatingChild} style={{ background: "#7C3AED", borderColor: "#7C3AED", fontWeight: 600 }}>
+                <Button type="primary" htmlType="submit" loading={creatingChild} style={{ background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", border: "none", fontWeight: 600, boxShadow: "0 4px 12px rgba(251,191,36,0.4)" }}>
                   Dodaj dziecko
                 </Button>
               </Form.Item>
@@ -684,10 +728,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <Card
               style={{
                 borderRadius: 12,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                border: "1px solid #E5E7EB"
+                boxShadow: isDark ? "0 0 20px rgba(251,191,36,0.15), 0 0 40px rgba(124,58,237,0.1)" : "0 2px 8px rgba(0,0,0,0.08)",
+                border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 18, fontWeight: 600, color: "#1F2937" }}>🎯 Przypisz dziecko do grupy</span>}
+              title={<span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>🎯 Przypisz dziecko do grupy</span>}
             >
             <Form
               layout="inline"
@@ -723,7 +768,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 </Select>
               </Form.Item>
               <Form.Item>
-                <Button type="primary" htmlType="submit" loading={assigning} style={{ background: "#7C3AED", borderColor: "#7C3AED", fontWeight: 600 }}>
+                <Button type="primary" htmlType="submit" loading={assigning} style={{ background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", border: "none", fontWeight: 600, boxShadow: "0 4px 12px rgba(251,191,36,0.4)" }}>
                   Przypisz
                 </Button>
               </Form.Item>
@@ -733,24 +778,40 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         )}
         {activeTab === "groups" && (
           <div style={{ width: "100%" }}>
-            <h3>Grupy</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 16 }}>🏫 Grupy</h3>
             <Table
               dataSource={groups}
               rowKey="id"
               pagination={false}
               scroll={{ x: true }}
+              onRow={() => ({
+                style: {
+                  transition: 'all 0.3s ease',
+                  cursor: 'default'
+                },
+                onMouseEnter: (e) => {
+                  if (isDark) {
+                    e.currentTarget.style.background = 'rgba(251,191,36,0.08)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(251,191,36,0.2)';
+                  }
+                },
+                onMouseLeave: (e) => {
+                  e.currentTarget.style.background = '';
+                  e.currentTarget.style.boxShadow = '';
+                }
+              })}
               columns={[
-                { title: "Nazwa", dataIndex: "name" },
+                { title: "Nazwa", dataIndex: "name", render: (text: string) => <span style={{ fontWeight: 600, color: isDark ? "#FBBF24" : "#7C3AED", fontSize: 15 }}>{text}</span> },
                 {
                   title: "Opiekun",
                   render: (_: any, record: any) => (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {record.caregiver ? (
                         <div>
-                          <div style={{ fontWeight: 500 }}>
+                          <div style={{ fontWeight: 600, color: isDark ? "#E5E7EB" : "#1F2937" }}>
                             {record.caregiver.firstName} {record.caregiver.lastName}
                           </div>
-                          <div style={{ fontSize: 12, color: '#6B7280' }}>
+                          <div style={{ fontSize: 12, color: isDark ? "#9CA3AF" : "#6B7280" }}>
                             {record.caregiver.email}
                           </div>
                         </div>
@@ -786,10 +847,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 {
                   title: "Dzieci",
                   dataIndex: "children",
-                  render: (children) =>
-                    children
-                      ?.map((c: any) => `${c.firstName} ${c.lastName}`)
-                      .join(", ") || "-",
+                  render: (children) => (
+                    <span style={{ color: isDark ? "#E5E7EB" : "#1F2937" }}>
+                      {children?.map((c: any) => `${c.firstName} ${c.lastName}`).join(", ") || "-"}
+                    </span>
+                  ),
                 },
                 {
                   title: "Akcje",
@@ -801,8 +863,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 },
               ]}
             />
-            <h3 style={{ marginTop: 32 }}>
-              {editingGroup ? "Edytuj grupę" : "Utwórz nową grupę"}
+            <h3 style={{ marginTop: 32, fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
+              {editingGroup ? "✏️ Edytuj grupę" : "➕ Utwórz nową grupę"}
             </h3>
             <Form
               form={groupForm}
@@ -818,7 +880,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 <Input placeholder="np. Żabki, Motylki" />
               </Form.Item>
               <Form.Item>
-                <Button type="primary" htmlType="submit" style={{ background: "#7C3AED", borderColor: "#7C3AED", fontWeight: 600 }}>
+                <Button type="primary" htmlType="submit" style={{ background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", border: "none", fontWeight: 600, boxShadow: "0 4px 12px rgba(251,191,36,0.4)" }}>
                   {editingGroup ? "Zapisz" : "Utwórz"}
                 </Button>
                 {editingGroup && (
@@ -833,6 +895,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             </Form>
           </div>
         )}
+        {activeTab === "settings" && <SettingsPage />}
       </Content>
       
       {/* Confirm role change modal */}

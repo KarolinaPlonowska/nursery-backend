@@ -3,6 +3,7 @@ import { Card, Form, Input, Button, message, Alert } from "antd";
 import { UserOutlined, TeamOutlined, HomeOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useTheme } from "../hooks/useTheme";
 
 const API_URL = "http://localhost:3000";
 
@@ -29,7 +30,9 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [passwordStrength, setPasswordStrength] = useState<any>(null);
+  const { theme } = useTheme();
   
+  const isDark = theme === 'dark';
   const roleFromUrl = searchParams.get("role");
   const role = (roleFromUrl === "PARENT" || roleFromUrl === "CAREGIVER") ? roleFromUrl : null;
 
@@ -75,7 +78,15 @@ export default function RegisterPage() {
   const roleIcon = role === "PARENT" ? <UserOutlined /> : <TeamOutlined />;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F9FAFB", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+    <div style={{ 
+      minHeight: "100vh", 
+      background: isDark ? "#0f0f0f" : "#F9FAFB", 
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      padding: "20px",
+      transition: "background-color 0.3s ease"
+    }}>
       <Card 
         style={{ 
           width: "100%", 
@@ -89,8 +100,8 @@ export default function RegisterPage() {
           <div style={{ fontSize: 40, color: "#7C3AED", marginBottom: 16, display: "flex", justifyContent: "center" }}>
             {roleIcon}
           </div>
-          <h1 style={{ fontSize: 28, color: "#1F2937", fontWeight: 700, margin: 0 }}>Utwórz konto</h1>
-          <p style={{ color: "#6B7280", marginTop: 8 }}>Rejestracja jako {roleLabel.toLowerCase()}</p>
+          <h1 style={{ fontSize: 28, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700, margin: 0 }}>Utwórz konto</h1>
+          <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginTop: 8 }}>Rejestracja jako {roleLabel.toLowerCase()}</p>
         </div>
 
         <Alert
@@ -113,21 +124,21 @@ export default function RegisterPage() {
           </Form.Item>
           <Form.Item
             name="firstName"
-            label={<span style={{ color: "#374151", fontWeight: 500 }}>Imię</span>}
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Imię</span>}
             rules={[{ required: true, message: "Podaj imię" }]}
           >
             <Input placeholder="np. Jan" size="large" />
           </Form.Item>
           <Form.Item
             name="lastName"
-            label={<span style={{ color: "#374151", fontWeight: 500 }}>Nazwisko</span>}
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Nazwisko</span>}
             rules={[{ required: true, message: "Podaj nazwisko" }]}
           >
             <Input placeholder="np. Kowalski" size="large" />
           </Form.Item>
           <Form.Item
             name="email"
-            label={<span style={{ color: "#374151", fontWeight: 500 }}>Email</span>}
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Email</span>}
             rules={[
               {
                 required: true,
@@ -141,7 +152,7 @@ export default function RegisterPage() {
           
           <Form.Item
             name="confirmEmail"
-            label={<span style={{ color: "#374151", fontWeight: 500 }}>Potwierdź email</span>}
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Potwierdź email</span>}
             dependencies={['email']}
             rules={[
               {
@@ -163,7 +174,7 @@ export default function RegisterPage() {
           
           <Form.Item
             name="password"
-            label={<span style={{ color: "#374151", fontWeight: 500 }}>Hasło (Silne)</span>}
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Hasło (Silne)</span>}
             rules={[
               {
                 required: true,
@@ -188,7 +199,7 @@ export default function RegisterPage() {
           </Form.Item>
           
           {passwordStrength && (
-            <div style={{ marginTop: -20, marginBottom: 16, padding: "12px", background: "#F9FAFB", borderRadius: 8, border: "1px solid #E5E7EB" }}>
+            <div style={{ marginTop: -20, marginBottom: 16, padding: "12px", background: isDark ? "#2a2a2a" : "#F9FAFB", borderRadius: 8, border: isDark ? "1px solid #3a3a3a" : "1px solid #E5E7EB", transition: "background-color 0.3s ease" }}>
               <div style={{ marginBottom: 8 }}>
                 <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Siła hasła:</div>
                 <div style={{

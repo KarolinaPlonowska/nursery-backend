@@ -10,13 +10,21 @@ import {
   UserOutlined,
   ScheduleOutlined,
 } from "@ant-design/icons";
+import { useTheme } from "../hooks/useTheme";
 import "./LandingPage.css";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  
+  const isDark = theme === 'dark';
 
   return (
-    <div style={{ minHeight: "calc(100vh - 200px)", background: "#F9FAFB" }}>
+    <div style={{ 
+      minHeight: "calc(100vh - 200px)", 
+      background: isDark ? "#0f0f0f" : "#F9FAFB",
+      transition: "background-color 0.3s ease"
+    }}>
       {/* Hero Section */}
       <div>
         <div className="landing-hero">
@@ -64,8 +72,18 @@ export default function LandingPage() {
         </div>
 
         {/* Features Section */}
-        <div style={{ padding: "60px 20px", background: "white", marginTop: 40 }}>
-          <h2 style={{ textAlign: "center", fontSize: 28, marginBottom: 50 }}>
+        <div style={{ 
+          padding: "60px 20px", 
+          background: isDark ? "#242424" : "white", 
+          marginTop: 40,
+          transition: "background-color 0.3s ease"
+        }}>
+          <h2 style={{ 
+            textAlign: "center", 
+            fontSize: 28, 
+            marginBottom: 50,
+            color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937"
+          }}>
             Funkcjonalności aplikacji
           </h2>
 
@@ -79,11 +97,13 @@ export default function LandingPage() {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   height: "100%",
                   padding: 32,
+                  background: isDark ? "#2a2a2a" : "white",
+                  transition: "background-color 0.3s ease"
                 }}
               >
                 <TeamOutlined style={{ fontSize: 48, color: "#7C3AED", marginBottom: 16 }} />
-                <h3 style={{ color: "#1F2937", fontWeight: 600 }}>Zarządzanie dziećmi</h3>
-                <p style={{ color: "#666" }}>
+                <h3 style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 600 }}>Zarządzanie dziećmi</h3>
+                <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#666" }}>
                   Dodawaj dzieci, przypisuj je do grup i monitoruj ich aktywności
                 </p>
               </Card>
@@ -98,11 +118,13 @@ export default function LandingPage() {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   height: "100%",
                   padding: 32,
+                  background: isDark ? "#2a2a2a" : "white",
+                  transition: "background-color 0.3s ease"
                 }}
               >
                 <ClockCircleOutlined style={{ fontSize: 48, color: "#FBBF24", marginBottom: 16 }} />
-                <h3 style={{ color: "#1F2937", fontWeight: 600 }}>Śledzenie obecności</h3>
-                <p style={{ color: "#666" }}>
+                <h3 style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 600 }}>Śledzenie obecności</h3>
+                <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#666" }}>
                   Rejestruj obecność dzieci i analizuj raporty uczestnictwa
                 </p>
               </Card>
@@ -117,11 +139,13 @@ export default function LandingPage() {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   height: "100%",
                   padding: 32,
+                  background: isDark ? "#2a2a2a" : "white",
+                  transition: "background-color 0.3s ease"
                 }}
               >
                 <SafetyOutlined style={{ fontSize: 48, color: "#8B5CF6", marginBottom: 16 }} />
-                <h3 style={{ color: "#1F2937", fontWeight: 600 }}>Bezpieczeństwo danych</h3>
-                <p style={{ color: "#666" }}>
+                <h3 style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 600 }}>Bezpieczeństwo danych</h3>
+                <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#666" }}>
                   Zabezpieczone hasła i autoryzacja na każdym kroku
                 </p>
               </Card>
@@ -136,11 +160,13 @@ export default function LandingPage() {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   height: "100%",
                   padding: 32,
+                  background: isDark ? "#2a2a2a" : "white",
+                  transition: "background-color 0.3s ease"
                 }}
               >
                 <SmileOutlined style={{ fontSize: 48, color: "#F59E0B", marginBottom: 16 }} />
-                <h3 style={{ color: "#1F2937", fontWeight: 600 }}>Łatwy interfejs</h3>
-                <p style={{ color: "#666" }}>
+                <h3 style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 600 }}>Łatwy interfejs</h3>
+                <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#666" }}>
                   Intuicyjny design dostępny dla wszystkich użytkowników
                 </p>
               </Card>
@@ -155,11 +181,13 @@ export default function LandingPage() {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   height: "100%",
                   padding: 32,
+                  background: isDark ? "#2a2a2a" : "white",
+                  transition: "background-color 0.3s ease"
                 }}
               >
                 <PlusOutlined style={{ fontSize: 48, color: "#7C3AED", marginBottom: 16 }} />
-                <h3 style={{ color: "#1F2937", fontWeight: 600 }}>Role użytkowników</h3>
-                <p style={{ color: "#666" }}>
+                <h3 style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 600 }}>Role użytkowników</h3>
+                <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#666" }}>
                   Różne poziomy dostępu dla rodziców, opiekunów i administratorów
                 </p>
               </Card>
@@ -174,11 +202,13 @@ export default function LandingPage() {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   height: "100%",
                   padding: 32,
+                  background: isDark ? "#2a2a2a" : "white",
+                  transition: "background-color 0.3s ease"
                 }}
               >
                 <TeamOutlined style={{ fontSize: 48, color: "#FBBF24", marginBottom: 16 }} />
-                <h3 style={{ color: "#1F2937", fontWeight: 600 }}>Zarządzanie grupami</h3>
-                <p style={{ color: "#666" }}>
+                <h3 style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 600 }}>Zarządzanie grupami</h3>
+                <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#666" }}>
                   Twórz grupy, przypisuj opiekunów i organizuj dzieci
                 </p>
               </Card>
@@ -187,10 +217,10 @@ export default function LandingPage() {
         </div>
 
         {/* CTA Section */}
-        <div style={{ padding: "60px 20px", background: "#F3F4F6", marginTop: 0 }}>
+        <div style={{ padding: "60px 20px", background: isDark ? "#0f0f0f" : "#F3F4F6", marginTop: 0, transition: "background-color 0.3s ease" }}>
           <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontSize: 28, marginBottom: 20, color: "#1F2937", fontWeight: 700 }}>Gotowy do rozpoczęcia?</h2>
-            <p style={{ fontSize: 16, color: "#6B7280", marginBottom: 40 }}>
+            <h2 style={{ fontSize: 28, marginBottom: 20, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700 }}>Gotowy do rozpoczęcia?</h2>
+            <p style={{ fontSize: 16, color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginBottom: 40 }}>
               Dołącz do nas już dziś i ułatw sobie zarządzanie przedszkolem
             </p>
             <Button
@@ -202,7 +232,7 @@ export default function LandingPage() {
             >
               Zaloguj się
             </Button>
-            <p style={{ fontSize: 14, marginBottom: 15, color: "#6B7280" }}>lub utwórz konto jako:</p>
+            <p style={{ fontSize: 14, marginBottom: 15, color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280" }}>lub utwórz konto jako:</p>
             <Space size="middle">
               <Button
                 size="large"

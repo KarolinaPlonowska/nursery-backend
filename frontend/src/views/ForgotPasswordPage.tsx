@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, Form, Input, Button, message, Divider, Steps } from "antd";
 import { MailOutlined, HomeOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { useTheme } from "../hooks/useTheme";
 
 const API_URL = "http://localhost:3000";
 
@@ -15,6 +16,9 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [resetToken, setResetToken] = useState("");
   const [form] = Form.useForm();
+  const { theme } = useTheme();
+  
+  const isDark = theme === 'dark';
 
   const stepIndex = step === "email" ? 0 : step === "code" ? 1 : 2;
 
@@ -58,7 +62,15 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F9FAFB", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+    <div style={{ 
+      minHeight: "100vh", 
+      background: isDark ? "#0f0f0f" : "#F9FAFB", 
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      padding: "20px",
+      transition: "background-color 0.3s ease"
+    }}>
       <Card 
         style={{ 
           width: "100%", 
@@ -70,10 +82,10 @@ export default function ForgotPasswordPage() {
       >
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <MailOutlined style={{ fontSize: 40, color: "#7C3AED", marginBottom: 16 }} />
-          <h1 style={{ fontSize: 28, color: "#1F2937", fontWeight: 700, margin: 0 }}>
+          <h1 style={{ fontSize: 28, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700, margin: 0 }}>
             Zresetuj hasło
           </h1>
-          <p style={{ color: "#6B7280", marginTop: 8 }}>
+          <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginTop: 8 }}>
             {step === "email"
               ? "Wpisz swój email aby otrzymać link do resetowania"
               : step === "code"
