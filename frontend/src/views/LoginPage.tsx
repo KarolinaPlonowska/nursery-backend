@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Form, Input, Button, message, Divider } from "antd";
+import { Card, Form, Input, Button, message, Divider, Alert } from "antd";
 import { LoginOutlined, HomeOutlined } from "@ant-design/icons";
 import axios from "axios";
-import { setUser } from "../utils/auth";
+import { setUser, getLogoutReason } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
 
 const API_URL = "http://localhost:3000";
@@ -12,9 +12,19 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logoutMessage, setLogoutMessage] = useState<string | null>(null);
   const { theme } = useTheme();
   
   const isDark = theme === 'dark';
+
+  // Sprawdź czy jest komunikat o wylogowaniu
+  useEffect(() => {
+    const reason = getLogoutReason();
+    if (reason) {
+      setLogoutMessage(reason);
+      message.warning(reason, 5); // Pokaż na 5 sekund
+    }
+  }, []);
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -64,6 +74,18 @@ export default function LoginPage() {
           <h1 style={{ fontSize: 28, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700, margin: 0 }}>Zaloguj się</h1>
           <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginTop: 8 }}>Dostęp do systemu zarządzania przedszkolem</p>
         </div>
+
+        {logoutMessage && (
+          <Alert
+            message="Wylogowano automatycznie"
+            description={logoutMessage}
+            type="warning"
+            showIcon
+            closable
+            onClose={() => setLogoutMessage(null)}
+            style={{ marginBottom: 24 }}
+          />
+        )}
 
         <Form
           name="login"

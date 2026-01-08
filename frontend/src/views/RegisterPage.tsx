@@ -198,6 +198,28 @@ export default function RegisterPage() {
             <Input.Password placeholder="•••••••••••" size="large" onChange={handlePasswordChange} />
           </Form.Item>
           
+          <Form.Item
+            name="confirmPassword"
+            label={<span style={{ color: isDark ? "rgba(255,255,255,0.87)" : "#374151", fontWeight: 500 }}>Powtórz hasło</span>}
+            dependencies={['password']}
+            rules={[
+              {
+                required: true,
+                message: "Potwierdź swoje hasło!",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Hasła nie są zgodne!'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password placeholder="Wpisz hasło ponownie" size="large" />
+          </Form.Item>
+          
           {passwordStrength && (
             <div style={{ marginTop: -20, marginBottom: 16, padding: "12px", background: isDark ? "#2a2a2a" : "#F9FAFB", borderRadius: 8, border: isDark ? "1px solid #3a3a3a" : "1px solid #E5E7EB", transition: "background-color 0.3s ease" }}>
               <div style={{ marginBottom: 8 }}>

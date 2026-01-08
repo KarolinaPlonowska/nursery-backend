@@ -33,9 +33,24 @@ export function setUser(user: any, role: string) {
   sessionStorage.setItem('userRole', role);
 }
 
-export function logout(navigate: any) {
+export function logout(navigate: any, reason?: string) {
   // Usuń dane z sessionStorage
   sessionStorage.removeItem('user');
   sessionStorage.removeItem('userRole');
+  
+  // Zapisz powód wylogowania jeśli podany
+  if (reason) {
+    sessionStorage.setItem('logoutReason', reason);
+  }
+  
   navigate('/login');
+}
+
+export function getLogoutReason() {
+  const reason = sessionStorage.getItem('logoutReason');
+  if (reason) {
+    sessionStorage.removeItem('logoutReason');
+    return reason;
+  }
+  return null;
 }

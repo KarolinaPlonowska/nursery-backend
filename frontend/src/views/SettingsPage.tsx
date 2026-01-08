@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Card, Form, Input, Button, message, Divider } from "antd";
-import { LockOutlined, UserOutlined, MailOutlined } from "@ant-design/icons";
+import { Card, Form, Input, Button, Divider, App } from "antd";
+import { LockOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
@@ -11,39 +11,9 @@ export default function SettingsPage() {
   const currentUser = getUser();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const [profileForm] = Form.useForm();
   const [passwordForm] = Form.useForm();
-  const [updatingProfile, setUpdatingProfile] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
-
-  const handleUpdateProfile = async (values: any) => {
-    setUpdatingProfile(true);
-    try {
-      const response = await axios.patch(
-        `${API_URL}/users/${currentUser?.id}/profile`,
-        {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          email: values.email,
-        },
-        { withCredentials: true }
-      );
-      message.success("Profil zaktualizowany pomyślnie");
-      
-      // Update localStorage with the response data
-      const updatedUser = { ...currentUser, ...response.data };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      // Reload the page to refresh all data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    } catch (err: any) {
-      message.error(err?.response?.data?.message || "Błąd aktualizacji profilu");
-    } finally {
-      setUpdatingProfile(false);
-    }
-  };
+  const { message } = App.useApp();
 
   const handleChangePassword = async (values: any) => {
     if (values.newPassword !== values.confirmPassword) {
@@ -53,7 +23,7 @@ export default function SettingsPage() {
 
     setUpdatingPassword(true);
     try {
-      await axios.patch(
+      const response = await axios.patch(
         `${API_URL}/users/${currentUser?.id}/password`,
         {
           currentPassword: values.currentPassword,
@@ -61,10 +31,15 @@ export default function SettingsPage() {
         },
         { withCredentials: true }
       );
-      message.success("Hasło zmienione pomyślnie");
+      
+      console.log('Password change response:', response.data);
+      
+      message.success("Hasło zmienione pomyślnie! Email z potwierdzeniem został wysłany.");
       passwordForm.resetFields();
     } catch (err: any) {
-      message.error(err?.response?.data?.message || "Błąd zmiany hasła");
+      console.error('Password change error:', err);
+      const errorMessage = err?.response?.data?.message || "Błąd zmiany hasła";
+      message.error(errorMessage);
     } finally {
       setUpdatingPassword(false);
     }
@@ -90,7 +65,7 @@ export default function SettingsPage() {
         ⚙️ Ustawienia konta
       </h2>
 
-      {/* Profile Settings Card */}
+      {/* Account Info Card */}
       <Card
         style={{
           marginBottom: 24,
@@ -101,78 +76,38 @@ export default function SettingsPage() {
         }}
         title={
           <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
-            <UserOutlined /> Dane osobowe
+            📋 Informacje o koncie
           </span>
         }
       >
-        <Form
-          form={profileForm}
-          layout="vertical"
-          onFinish={handleUpdateProfile}
-          initialValues={{
-            firstName: currentUser?.firstName || "",
-            lastName: currentUser?.lastName || "",
-            email: currentUser?.email || "",
-          }}
-        >
-          <Form.Item
-            name="firstName"
-            label={<span style={{ color: isDark ? "#E5E7EB" : undefined, fontWeight: 500 }}>Imię</span>}
-            rules={[{ required: true, message: "Podaj imię" }]}
-          >
-            <Input 
-              prefix={<UserOutlined style={{ color: isDark ? "#FBBF24" : undefined }} />}
-              placeholder="Imię" 
-              size="large"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="lastName"
-            label={<span style={{ color: isDark ? "#E5E7EB" : undefined, fontWeight: 500 }}>Nazwisko</span>}
-            rules={[{ required: true, message: "Podaj nazwisko" }]}
-          >
-            <Input 
-              prefix={<UserOutlined style={{ color: isDark ? "#FBBF24" : undefined }} />}
-              placeholder="Nazwisko" 
-              size="large"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="email"
-            label={<span style={{ color: isDark ? "#E5E7EB" : undefined, fontWeight: 500 }}>Email</span>}
-            rules={[
-              { required: true, message: "Podaj email" },
-              { type: "email", message: "Podaj prawidłowy email" }
-            ]}
-          >
-            <Input 
-              prefix={<MailOutlined style={{ color: isDark ? "#FBBF24" : undefined }} />}
-              placeholder="email@example.com" 
-              size="large"
-              type="email"
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={updatingProfile}
-              size="large"
-              style={{ 
-                background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", 
-                border: "none", 
-                fontWeight: 600, 
-                boxShadow: "0 4px 12px rgba(251,191,36,0.4)",
-                width: "100%"
-              }}
-            >
-              Zapisz zmiany
-            </Button>
-          </Form.Item>
-        </Form>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+            <span style={{ color: isDark ? "#9CA3AF" : "#6B7280", fontWeight: 500 }}>Imię i nazwisko:</span>
+            <span style={{ color: isDark ? "#E5E7EB" : "#1F2937", fontWeight: 600 }}>
+              {currentUser?.firstName} {currentUser?.lastName}
+            </span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+            <span style={{ color: isDark ? "#9CA3AF" : "#6B7280", fontWeight: 500 }}>Email:</span>
+            <span style={{ color: isDark ? "#E5E7EB" : "#1F2937", fontWeight: 600 }}>
+              {currentUser?.email}
+            </span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+            <span style={{ color: isDark ? "#9CA3AF" : "#6B7280", fontWeight: 500 }}>Rola:</span>
+            <span style={{ color: isDark ? "#FBBF24" : "#7C3AED", fontWeight: 600 }}>
+              {currentUser?.role === 'ADMIN' ? 'Administrator' : 
+               currentUser?.role === 'PARENT' ? 'Rodzic' : 
+               currentUser?.role === 'CAREGIVER' ? 'Opiekun' : currentUser?.role}
+            </span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+            <span style={{ color: isDark ? "#9CA3AF" : "#6B7280", fontWeight: 500 }}>Status email:</span>
+            <span style={{ color: currentUser?.emailVerified ? "#10B981" : "#EF4444", fontWeight: 600 }}>
+              {currentUser?.emailVerified ? "✓ Zweryfikowany" : "✗ Niezweryfikowany"}
+            </span>
+          </div>
+        </div>
       </Card>
 
       {/* Password Change Card */}
@@ -214,12 +149,33 @@ export default function SettingsPage() {
             label={<span style={{ color: isDark ? "#E5E7EB" : undefined, fontWeight: 500 }}>Nowe hasło</span>}
             rules={[
               { required: true, message: "Podaj nowe hasło" },
-              { min: 6, message: "Hasło musi mieć minimum 6 znaków" }
+              { min: 12, message: "Hasło musi mieć minimum 12 znaków" },
+              {
+                pattern: /[a-z]/,
+                message: "Hasło musi zawierać co najmniej jedną małą literę",
+              },
+              {
+                pattern: /[A-Z]/,
+                message: "Hasło musi zawierać co najmniej jedną wielką literę",
+              },
+              {
+                pattern: /[0-9]/,
+                message: "Hasło musi zawierać co najmniej jedną cyfrę",
+              },
+              {
+                pattern: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
+                message: "Hasło musi zawierać co najmniej jeden znak specjalny",
+              },
             ]}
+            extra={
+              <span style={{ fontSize: 12, color: isDark ? "#9CA3AF" : "#6B7280" }}>
+                Hasło musi zawierać: min. 12 znaków, wielką i małą literę, cyfrę i znak specjalny
+              </span>
+            }
           >
             <Input.Password 
               prefix={<LockOutlined style={{ color: isDark ? "#FBBF24" : undefined }} />}
-              placeholder="Minimum 6 znaków" 
+              placeholder="Minimum 12 znaków" 
               size="large"
             />
           </Form.Item>
@@ -264,38 +220,6 @@ export default function SettingsPage() {
             </Button>
           </Form.Item>
         </Form>
-      </Card>
-
-      {/* Account Info Card */}
-      <Card
-        style={{
-          borderRadius: 12,
-          boxShadow: isDark ? "0 0 20px rgba(251,191,36,0.15), 0 0 40px rgba(124,58,237,0.1)" : "0 2px 8px rgba(0,0,0,0.08)",
-          border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
-          background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
-        }}
-        title={
-          <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
-            📋 Informacje o koncie
-          </span>
-        }
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
-            <span style={{ color: isDark ? "#9CA3AF" : "#6B7280", fontWeight: 500 }}>Rola:</span>
-            <span style={{ color: isDark ? "#FBBF24" : "#7C3AED", fontWeight: 600 }}>
-              {currentUser?.role === 'ADMIN' ? 'Administrator' : 
-               currentUser?.role === 'PARENT' ? 'Rodzic' : 
-               currentUser?.role === 'CAREGIVER' ? 'Opiekun' : currentUser?.role}
-            </span>
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
-            <span style={{ color: isDark ? "#9CA3AF" : "#6B7280", fontWeight: 500 }}>Status email:</span>
-            <span style={{ color: currentUser?.emailVerified ? "#10B981" : "#EF4444", fontWeight: 600 }}>
-              {currentUser?.emailVerified ? "✓ Zweryfikowany" : "✗ Niezweryfikowany"}
-            </span>
-          </div>
-        </div>
       </Card>
     </div>
   );

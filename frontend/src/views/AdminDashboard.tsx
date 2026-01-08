@@ -6,11 +6,13 @@ import {
   AppstoreOutlined,
   LogoutOutlined,
   SettingOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
 import SettingsPage from "./SettingsPage";
+import AttendanceStatistics from "../components/AttendanceStatistics";
 
 const { Option } = Select;
 const { Header, Content } = Layout;
@@ -370,6 +372,9 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           <Menu.Item key="groups" icon={<AppstoreOutlined />}>
             Grupy
           </Menu.Item>
+          <Menu.Item key="attendance" icon={<BarChartOutlined />}>
+            Statystyki obecności
+          </Menu.Item>
           <Menu.Item key="settings" icon={<SettingOutlined />}>
             Ustawienia
           </Menu.Item>
@@ -384,12 +389,13 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       </Header>
       <Content
         style={{
-          margin: "96px auto 32px auto",
+          margin: "24px auto 32px auto",
           width: "100%",
           padding: "24px",
           maxWidth: 1200,
         }}
       >
+        {activeTab === "attendance" && <AttendanceStatistics />}
         {activeTab === "users" && (
           <div style={{ width: "100%" }}>
             <Card
@@ -1008,6 +1014,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </div>
         )}
       </Modal>
+      
+      {activeTab === "settings" && <SettingsPage />}
     </Layout>
   );
 }

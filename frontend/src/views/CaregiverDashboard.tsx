@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Table, message, Collapse, Menu, Layout } from "antd";
-import { LogoutOutlined, TeamOutlined, SettingOutlined } from "@ant-design/icons";
+import { Card, Button, Table, message, Collapse, Menu, Layout, Select } from "antd";
+import { LogoutOutlined, TeamOutlined, SettingOutlined, CheckSquareOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
 import SettingsPage from "./SettingsPage";
+import AttendanceView from "../components/AttendanceView";
 
-const { Panel } = Collapse;
 const { Header, Content } = Layout;
 const API_URL = "http://localhost:3000";
 
@@ -17,6 +17,7 @@ export default function CaregiverDashboard({
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("groups");
+  const [selectedGroupForAttendance, setSelectedGroupForAttendance] = useState<string | null>(null);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -36,6 +37,30 @@ export default function CaregiverDashboard({
     };
     fetchMyGroups();
   }, []);
+useEffect(() => {
+    // Automatycznie wybierz pierwszą grupę dla widoku obecności
+    if (groups.length > 0 && !selectedGroupForAttendance) {
+      setSelectedGroupForAttendance(groups[0].id);
+    }
+  }, [groups]);
+
+  const menuItems = [
+    {
+      key: "groups",
+      icon: <TeamOutlined />,
+      label: "Moje grupy",
+    },
+    {
+      key: "attendance",
+      icon: <CheckSquareOutlined />,
+      label: "Lista obecności",
+    },
+    {
+      key: "settings",
+      icon: <SettingOutlined />,
+      label: "Ustawienia",
+    },
+  ];
 
   return (
     <Layout style={{ background: isDark ? "linear-gradient(180deg, #0f0a1a 0%, #141414 50%, #0f0a1a 100%)" : "#F9FAFB", minHeight: "100vh", transition: "background-color 0.3s ease" }}>
@@ -47,37 +72,46 @@ export default function CaregiverDashboard({
           width: "100%",
           top: 0,
           boxShadow: "0 2px 12px rgba(251,191,36,0.3)",
-          padding: 0,
+          padding: "0 24px",
           display: "flex",
           alignItems: "center",
+          height: "64px",
         }}
       >
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={[activeTab]}
-          onClick={({ key }) => {
-            if (key === "logout") onLogout();
-            else setActiveTab(key);
-          }}
-          style={{ flex: 1, minWidth: 0, display: "flex", background: "transparent" }}
-        >
-          <Menu.Item key="groups" icon={<TeamOutlined />}>
-            Moje grupy
-          </Menu.Item>
-          <Menu.Item key="settings" icon={<SettingOutlined />}>
-            Ustawienia
-          </Menu.Item>
-          <Menu.Item
-            key="logout"
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          width: "100%",
+          gap: "16px",
+        }}>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            selectedKeys={[activeTab]}
+            items={menuItems}
+            onClick={({ key }) => setActiveTab(key)}
+            style={{ 
+              flex: 1,
+              background: "transparent",
+              border: "none",
+            }}
+          />
+          <Button
+            type="text"
             icon={<LogoutOutlined />}
-            style={{ marginLeft: "auto" }}
+            onClick={onLogout}
+            style={{
+              color: "white",
+              flexShrink: 0,
+              height: "40px",
+              padding: "0 15px",
+            }}
           >
             Wyloguj
-          </Menu.Item>
-        </Menu>
+          </Button>
+        </div>
       </Header>
-      <Content style={{ margin: "96px auto 32px auto", width: "100%", padding: "24px", maxWidth: 1200 }}>
+      <Content style={{ margin: "24px auto 32px auto", width: "100%", padding: "24px", maxWidth: 1200 }}>
         {activeTab === "groups" && (
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
             {loading ? (
@@ -99,28 +133,19 @@ export default function CaregiverDashboard({
               <Collapse 
                 defaultActiveKey={groups.map(g => g.id)}
                 style={{ background: "transparent", border: "none" }}
-              >
-                {groups.map((group: any) => (
-                  <Panel
-                    header={
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 18, fontWeight: 600, color: isDark ? "#FBBF24" : "#1F2937" }}>
-                          👶 Grupa: {group.name}
-                        </span>
-                        <span style={{ fontSize: 14, color: isDark ? "#A78BFA" : "#6B7280" }}>
-                          Dzieci: {group.children?.length || 0}
-                        </span>
-                      </div>
-                    }
-                    key={group.id}
-                    style={{
-                      marginBottom: 16,
-                      borderRadius: 12,
-                      boxShadow: isDark ? "0 0 20px rgba(123,58,237,0.4)" : "0 2px 8px rgba(0,0,0,0.08)",
-                      border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
-                      background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : "white"
-                    }}
-                  >
+                items={groups.map((group: any) => ({
+                  key: group.id,
+                  label: (
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 18, fontWeight: 600, color: isDark ? "#FBBF24" : "#1F2937" }}>
+                        👶 Grupa: {group.name}
+                      </span>
+                      <span style={{ fontSize: 14, color: isDark ? "#A78BFA" : "#6B7280" }}>
+                        Dzieci: {group.children?.length || 0}
+                      </span>
+                    </div>
+                  ),
+                  children: (
                     <Table
                       dataSource={group.children || []}
                       rowKey="id"
@@ -130,21 +155,21 @@ export default function CaregiverDashboard({
                           title: "Imię", 
                           dataIndex: "firstName", 
                           render: (_: any, record: any) => (
-                            <span style={{ fontWeight: 500, color: "#1F2937" }}>{record.firstName}</span>
+                            <span style={{ fontWeight: 500, color: isDark ? "#E5E7EB" : "#1F2937" }}>{record.firstName}</span>
                           ) 
                         },
                         { 
                           title: "Nazwisko", 
                           dataIndex: "lastName", 
                           render: (_: any, record: any) => (
-                            <span style={{ fontWeight: 500, color: "#1F2937" }}>{record.lastName}</span>
+                            <span style={{ fontWeight: 500, color: isDark ? "#E5E7EB" : "#1F2937" }}>{record.lastName}</span>
                           ) 
                         },
                         {
                           title: "Data urodzenia",
                           dataIndex: "birthDate",
                           render: (date) => date && (
-                            <span style={{ color: "#6B7280" }}>{date.slice(0, 10)}</span>
+                            <span style={{ color: isDark ? "#D1D5DB" : "#6B7280" }}>{date.slice(0, 10)}</span>
                           ),
                         },
                         {
@@ -154,29 +179,96 @@ export default function CaregiverDashboard({
                               const hasName = record.parent.firstName && record.parent.lastName;
                               return (
                                 <div>
-                                  <div style={{ fontWeight: 500, color: "#1F2937" }}>
+                                  <div style={{ fontWeight: 500, color: isDark ? "#E5E7EB" : "#1F2937" }}>
                                     {hasName 
                                       ? `${record.parent.firstName} ${record.parent.lastName}`
                                       : record.parent.email
                                     }
                                   </div>
                                   {hasName && (
-                                    <div style={{ fontSize: 12, color: "#6B7280" }}>
+                                    <div style={{ fontSize: 12, color: isDark ? "#D1D5DB" : "#6B7280" }}>
                                       {record.parent.email}
                                     </div>
                                   )}
                                 </div>
                               );
                             }
-                            return <span style={{ color: "#9CA3AF" }}>Brak rodzica</span>;
+                            return <span style={{ color: isDark ? "#9CA3AF" : "#9CA3AF" }}>Brak rodzica</span>;
                           },
                         },
                       ]}
                       locale={{ emptyText: "Brak dzieci w tej grupie" }}
                     />
-                  </Panel>
-                ))}
-              </Collapse>
+                  ),
+                  style: {
+                    marginBottom: 16,
+                    borderRadius: 12,
+                    boxShadow: isDark ? "0 0 20px rgba(123,58,237,0.4)" : "0 2px 8px rgba(0,0,0,0.08)",
+                    border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                    background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : "white"
+                  }
+                }))}
+              />
+            )}
+          </div>
+        )}
+        {activeTab === "attendance" && (
+          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+            {groups.length === 0 ? (
+              <Card
+                style={{
+                  borderRadius: 12,
+                  boxShadow: isDark ? "0 0 20px rgba(123,58,237,0.4)" : "0 2px 8px rgba(0,0,0,0.08)",
+                  border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                  background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : "white"
+                }}
+              >
+                <p style={{ textAlign: "center", color: isDark ? "#A78BFA" : "#6B7280", fontSize: 16 }}>
+                  Nie masz przypisanych żadnych grup.
+                </p>
+              </Card>
+            ) : (
+              <div style={{ marginBottom: 16 }}>
+                {groups.length > 1 && (
+                  <Card
+                    style={{
+                      marginBottom: 16,
+                      borderRadius: 12,
+                      boxShadow: isDark ? "0 0 20px rgba(123,58,237,0.4)" : "0 2px 8px rgba(0,0,0,0.08)",
+                      border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
+                      background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : "white"
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                      <span style={{ fontWeight: 500, color: isDark ? "#E5E7EB" : "#1F2937" }}>
+                        Wybierz grupę:
+                      </span>
+                      <Select
+                        value={selectedGroupForAttendance}
+                        onChange={setSelectedGroupForAttendance}
+                        style={{ width: 300 }}
+                      >
+                        {groups.map(group => (
+                          <Select.Option key={group.id} value={group.id}>
+                            {group.name} ({group.children?.length || 0} dzieci)
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </div>
+                  </Card>
+                )}
+                
+                {selectedGroupForAttendance && (() => {
+                  const selectedGroup = groups.find(g => g.id === selectedGroupForAttendance);
+                  return selectedGroup ? (
+                    <AttendanceView
+                      groupId={selectedGroup.id}
+                      groupName={selectedGroup.name}
+                      children={selectedGroup.children || []}
+                    />
+                  ) : null;
+                })()}
+              </div>
             )}
           </div>
         )}
