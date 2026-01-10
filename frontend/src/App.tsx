@@ -28,6 +28,7 @@ export default function App() {
   const isLoggedIn = !!getToken();
   const userRole = getUserRole();
 
+  // AUTOMATYCZNE WYLOGOWANIE PO BEZCZYNNOŚCI
   // Stan dla ostrzeżenia o bezczynności
   const [showWarning, setShowWarning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -36,8 +37,8 @@ export default function App() {
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const isWarningShownRef = useRef(false);
 
-  const IDLE_TIME = 5 * 60 * 1000; // 5 minut do testów
-  const WARNING_TIME = 1 * 60 * 1000; // Ostrzeżenie 1 minutę przed wylogowaniem
+  const IDLE_TIME = 30 * 60 * 1000; // 30 minut bezczynności
+  const WARNING_TIME = 5 * 60 * 1000; // Ostrzeżenie 5 minut przed wylogowaniem
 
   const resetIdleTimer = () => {
     // Nie resetuj jeśli ostrzeżenie już się pokazuje
@@ -138,43 +139,47 @@ export default function App() {
           
           {!isLandingPage && !isAuthPage && isLoggedIn && (
             <Header style={{ background: "#5B21B6", display: "flex", alignItems: "center" }}>
-              <Menu theme="dark" mode="horizontal" selectable={false} style={{ background: "#5B21B6", flex: 1 }}>
-                <Menu.Item
-                  key="home"
-                  icon={<HomeOutlined />}
-                  onClick={() => {
-                    if (userRole === "ADMIN") navigate("/admin");
-                    else if (userRole === "PARENT") navigate("/parent");
-                    else if (userRole === "CAREGIVER") navigate("/caregiver");
-                    else navigate("/");
-                  }}
-                >
-                  Home
-                </Menu.Item>
-                {userRole === "ADMIN" && (
-                  <Menu.Item key="admin" icon={<UserOutlined />}>
-                    <Link to="/admin">Admin Panel</Link>
-                  </Menu.Item>
-                )}
-                {userRole === "PARENT" && (
-                  <Menu.Item key="parent" icon={<UserOutlined />}>
-                    <Link to="/parent">My Children</Link>
-                  </Menu.Item>
-                )}
-                {userRole === "CAREGIVER" && (
-                  <Menu.Item key="caregiver" icon={<UserOutlined />}>
-                    <Link to="/caregiver">Attendance</Link>
-                  </Menu.Item>
-                )}
-                <Menu.Item
-                  key="logout"
-                  icon={<LogoutOutlined />}
-                  onClick={() => logout(navigate)}
-                  style={{ marginLeft: "auto" }}
-                >
-                  Logout
-                </Menu.Item>
-              </Menu>
+              <Menu 
+                theme="dark" 
+                mode="horizontal" 
+                selectable={false} 
+                style={{ background: "#5B21B6", flex: 1 }}
+                items={[
+                  {
+                    key: "home",
+                    icon: <HomeOutlined />,
+                    label: "Home",
+                    onClick: () => {
+                      if (userRole === "ADMIN") navigate("/admin");
+                      else if (userRole === "PARENT") navigate("/parent");
+                      else if (userRole === "CAREGIVER") navigate("/caregiver");
+                      else navigate("/");
+                    }
+                  },
+                  ...(userRole === "ADMIN" ? [{
+                    key: "admin",
+                    icon: <UserOutlined />,
+                    label: <Link to="/admin">Admin Panel</Link>
+                  }] : []),
+                  ...(userRole === "PARENT" ? [{
+                    key: "parent",
+                    icon: <UserOutlined />,
+                    label: <Link to="/parent">My Children</Link>
+                  }] : []),
+                  ...(userRole === "CAREGIVER" ? [{
+                    key: "caregiver",
+                    icon: <UserOutlined />,
+                    label: <Link to="/caregiver">Attendance</Link>
+                  }] : []),
+                  {
+                    key: "logout",
+                    icon: <LogoutOutlined />,
+                    label: "Logout",
+                    onClick: () => logout(navigate),
+                    style: { marginLeft: "auto" }
+                  }
+                ]}
+              />
             </Header>
           )}
           <Content style={{ padding: isLandingPage ? "0" : "2rem" }}>

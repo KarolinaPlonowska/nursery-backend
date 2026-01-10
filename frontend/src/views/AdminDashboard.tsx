@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, Table, Select, Button, Form, Input, message, Layout, Menu, DatePicker, Modal, Tooltip } from "antd";
+import { Card, Table, Select, Button, Form, Input, message, Layout, Menu, DatePicker, Modal, Tooltip, Tabs, Badge } from "antd";
 import {
   UserOutlined,
   TeamOutlined,
@@ -7,12 +7,15 @@ import {
   LogoutOutlined,
   SettingOutlined,
   BarChartOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
 import SettingsPage from "./SettingsPage";
 import AttendanceStatistics from "../components/AttendanceStatistics";
+import MessagesView from "../components/MessagesView";
+import AnnouncementsView from "../components/AnnouncementsView";
 
 const { Option } = Select;
 const { Header, Content } = Layout;
@@ -58,6 +61,21 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     newCaregiverId: string;
     currentCaregiver: string;
   } | null>(null);
+  const [unviewedCount, setUnviewedCount] = useState(0);
+
+  const fetchUnviewedCount = async () => {
+    console.log('fetchUnviewedCount called');
+    try {
+      const res = await axios.get(`${API_URL}/announcements/unviewed/count`, {
+        withCredentials: true,
+      });
+      console.log('fetchUnviewedCount response:', res.data);
+      setUnviewedCount(res.data.count);
+      console.log('setUnviewedCount called with:', res.data.count);
+    } catch (err) {
+      console.error('Failed to fetch unviewed count:', err);
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -90,6 +108,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   useEffect(() => {
     fetchData();
+    fetchUnviewedCount();
+    // Odśwież co minutę
+    const interval = setInterval(fetchUnviewedCount, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
@@ -362,30 +384,49 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             else setActiveTab(key);
           }}
           style={{ flex: 1, minWidth: 0, display: "flex", background: "transparent" }}
-        >
-          <Menu.Item key="users" icon={<UserOutlined />}>
-            Użytkownicy
-          </Menu.Item>
-          <Menu.Item key="children" icon={<TeamOutlined />}>
-            Dzieci
-          </Menu.Item>
-          <Menu.Item key="groups" icon={<AppstoreOutlined />}>
-            Grupy
-          </Menu.Item>
-          <Menu.Item key="attendance" icon={<BarChartOutlined />}>
-            Statystyki obecności
-          </Menu.Item>
-          <Menu.Item key="settings" icon={<SettingOutlined />}>
-            Ustawienia
-          </Menu.Item>
-          <Menu.Item
-            key="logout"
-            icon={<LogoutOutlined />}
-            style={{ marginLeft: "auto" }}
-          >
-            Wyloguj
-          </Menu.Item>
-        </Menu>
+          items={[
+            {
+              key: "users",
+              icon: <UserOutlined />,
+              label: "Użytkownicy"
+            },
+            {
+              key: "children",
+              icon: <TeamOutlined />,
+              label: "Dzieci"
+            },
+            {
+              key: "groups",
+              icon: <AppstoreOutlined />,
+              label: "Grupy"
+            },
+            {
+              key: "attendance",
+              icon: <BarChartOutlined />,
+              label: "Statystyki obecności"
+            },
+            {
+              key: "communication",
+              icon: <MessageOutlined />,
+              label: (
+                <Badge count={unviewedCount} offset={[10, 0]}>
+                  Komunikacja
+                </Badge>
+              )
+            },
+            {
+              key: "settings",
+              icon: <SettingOutlined />,
+              label: "Ustawienia"
+            },
+            {
+              key: "logout",
+              icon: <LogoutOutlined />,
+              label: "Wyloguj",
+              style: { marginLeft: "auto" }
+            }
+          ]}
+        />
       </Header>
       <Content
         style={{
@@ -554,9 +595,29 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               <Form.Item
                 name="password"
                 label="Hasło"
-                rules={[{ required: true, min: 6, message: "Min. 6 znaków" }]}
+                rules={[
+                  { required: true, message: "Podaj hasło" },
+                  { min: 12, message: "Hasło musi mieć co najmniej 12 znaków" },
+                  {
+                    pattern: /[A-Z]/,
+                    message: "Hasło musi zawierać wielką literę (A-Z)"
+                  },
+                  {
+                    pattern: /[a-z]/,
+                    message: "Hasło musi zawierać małą literę (a-z)"
+                  },
+                  {
+                    pattern: /[0-9]/,
+                    message: "Hasło musi zawierać cyfrę (0-9)"
+                  },
+                  {
+                    pattern: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/,
+                    message: "Hasło musi zawierać znak specjalny (!@#$%^&* itd.)"
+                  }
+                ]}
+                tooltip="Min. 12 znaków, wielka i mała litera, cyfra oraz znak specjalny"
               >
-                <Input.Password placeholder="Min. 6 znaków" />
+                <Input.Password placeholder="Min. 12 znaków z wymaganymi znakami" />
               </Form.Item>
               {showInviteCode && (
                 <Form.Item
@@ -902,6 +963,29 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </div>
         )}
         {activeTab === "settings" && <SettingsPage />}
+        {activeTab === "communication" && (
+          <div style={{ width: "100%" }}>
+            <Tabs
+              defaultActiveKey={unviewedCount > 0 ? "announcements" : "messages"}
+              items={[
+                {
+                  key: "messages",
+                  label: "💬 Wiadomości",
+                  children: <MessagesView />,
+                },
+                {
+                  key: "announcements",
+                  label: (
+                    <Badge count={unviewedCount} offset={[10, 0]}>
+                      📢 Ogłoszenia
+                    </Badge>
+                  ),
+                  children: <AnnouncementsView onAnnouncementsViewed={fetchUnviewedCount} />,
+                },
+              ]}
+            />
+          </div>
+        )}
       </Content>
       
       {/* Confirm role change modal */}
@@ -1014,8 +1098,6 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </div>
         )}
       </Modal>
-      
-      {activeTab === "settings" && <SettingsPage />}
     </Layout>
   );
 }

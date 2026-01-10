@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Card, Form, Input, Button, Divider, App } from "antd";
-import { LockOutlined } from "@ant-design/icons";
+import { Card, Form, Input, Button, Divider, App, Modal } from "antd";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
@@ -13,7 +13,15 @@ export default function SettingsPage() {
   const isDark = theme === 'dark';
   const [passwordForm] = Form.useForm();
   const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [sendingVerification, setSendingVerification] = useState(false);
+  const [verificationModalVisible, setVerificationModalVisible] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verifyingCode, setVerifyingCode] = useState(false);
   const { message } = App.useApp();
+
+  // Debug - sprawdź dane użytkownika
+  console.log('SettingsPage - currentUser:', currentUser);
+  console.log('SettingsPage - emailVerified:', currentUser?.emailVerified);
 
   const handleChangePassword = async (values: any) => {
     if (values.newPassword !== values.confirmPassword) {
@@ -42,6 +50,60 @@ export default function SettingsPage() {
       message.error(errorMessage);
     } finally {
       setUpdatingPassword(false);
+    }
+  };
+
+  const handleSendVerificationEmail = async () => {
+    setSendingVerification(true);
+    try {
+      await axios.post(
+        `${API_URL}/auth/resend-verification-code`,
+        { email: currentUser?.email },
+        { withCredentials: true }
+      );
+      message.success("Kod weryfikacyjny został wysłany na email!");
+      setVerificationModalVisible(true);
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || "Błąd wysyłania kodu weryfikacyjnego";
+      message.error(errorMessage);
+    } finally {
+      setSendingVerification(false);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      message.error("Wprowadź 6-cyfrowy kod");
+      return;
+    }
+
+    setVerifyingCode(true);
+    try {
+      const response = await axios.post(
+        `${API_URL}/auth/verify-email`,
+        { 
+          email: currentUser?.email,
+          code: verificationCode 
+        },
+        { withCredentials: true }
+      );
+      
+      // Zaktualizuj dane użytkownika w sessionStorage
+      if (response.data.user) {
+        const updatedUser = { ...currentUser, emailVerified: true };
+        sessionStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+      
+      message.success("Email został zweryfikowany pomyślnie!");
+      setVerificationModalVisible(false);
+      setVerificationCode("");
+      // Odśwież stronę aby zaktualizować status
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || "Nieprawidłowy kod weryfikacyjny";
+      message.error(errorMessage);
+    } finally {
+      setVerifyingCode(false);
     }
   };
 
@@ -101,11 +163,28 @@ export default function SettingsPage() {
                currentUser?.role === 'CAREGIVER' ? 'Opiekun' : currentUser?.role}
             </span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", alignItems: "center" }}>
             <span style={{ color: isDark ? "#9CA3AF" : "#6B7280", fontWeight: 500 }}>Status email:</span>
-            <span style={{ color: currentUser?.emailVerified ? "#10B981" : "#EF4444", fontWeight: 600 }}>
-              {currentUser?.emailVerified ? "✓ Zweryfikowany" : "✗ Niezweryfikowany"}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ color: currentUser?.emailVerified ? "#10B981" : "#EF4444", fontWeight: 600 }}>
+                {currentUser?.emailVerified ? "✓ Zweryfikowany" : "✗ Niezweryfikowany"}
+              </span>
+              {!currentUser?.emailVerified && currentUser?.role !== 'ADMIN' && (
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<MailOutlined />}
+                  onClick={handleSendVerificationEmail}
+                  loading={sendingVerification}
+                  style={{
+                    background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)",
+                    border: "none",
+                  }}
+                >
+                  Zweryfikuj
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </Card>
@@ -221,6 +300,56 @@ export default function SettingsPage() {
           </Form.Item>
         </Form>
       </Card>
+
+      {/* Email Verification Modal */}
+      <Modal
+        title="📧 Weryfikacja emaila"
+        open={verificationModalVisible}
+        onCancel={() => {
+          setVerificationModalVisible(false);
+          setVerificationCode("");
+        }}
+        footer={null}
+      >
+        <div style={{ padding: "20px 0" }}>
+          <p style={{ marginBottom: 20, fontSize: 15 }}>
+            Wprowadź 6-cyfrowy kod weryfikacyjny wysłany na adres:
+            <br />
+            <strong>{currentUser?.email}</strong>
+          </p>
+          <Input
+            placeholder="Kod weryfikacyjny (6 cyfr)"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            maxLength={6}
+            size="large"
+            style={{ marginBottom: 20 }}
+          />
+          <Button
+            type="primary"
+            block
+            size="large"
+            onClick={handleVerifyEmail}
+            loading={verifyingCode}
+            style={{
+              background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)",
+              border: "none",
+              fontWeight: 600,
+            }}
+          >
+            Weryfikuj
+          </Button>
+          <Button
+            type="link"
+            block
+            onClick={handleSendVerificationEmail}
+            loading={sendingVerification}
+            style={{ marginTop: 10 }}
+          >
+            Wyślij kod ponownie
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

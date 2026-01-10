@@ -34,6 +34,11 @@ export default function LoginPage() {
         withCredentials: true, // Istotne - wysłanie cookies
       });
       
+      // Debug - sprawdź odpowiedź z backendu
+      console.log('Login response:', res.data);
+      console.log('User data:', res.data.user);
+      console.log('emailVerified from backend:', res.data.user?.emailVerified);
+      
       // Przechowaj dane użytkownika w sessionStorage
       setUser(res.data.user, res.data.user.role);
       

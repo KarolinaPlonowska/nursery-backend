@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Table, message, Menu, Layout, Select, Space } from "antd";
-import { LogoutOutlined, TeamOutlined, SettingOutlined, CheckSquareOutlined } from "@ant-design/icons";
+import { Card, Button, Table, message, Menu, Layout, Select, Space, Tabs, Badge } from "antd";
+import { LogoutOutlined, TeamOutlined, SettingOutlined, CheckSquareOutlined, MessageOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
 import SettingsPage from "./SettingsPage";
 import ChildAttendanceHistory from "../components/ChildAttendanceHistory";
+import MessagesView from "../components/MessagesView";
+import AnnouncementsView from "../components/AnnouncementsView";
 
 const { Header, Content } = Layout;
 
@@ -21,6 +23,18 @@ export default function ParentDashboard({
   const [selectedChildForAttendance, setSelectedChildForAttendance] = useState<string | null>(null);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [unviewedCount, setUnviewedCount] = useState(0);
+
+  const fetchUnviewedCount = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/announcements/unviewed/count`, {
+        withCredentials: true,
+      });
+      setUnviewedCount(res.data.count);
+    } catch (err) {
+      console.error('Failed to fetch unviewed count:', err);
+    }
+  };
 
   const fetchChildren = async () => {
     setLoading(true);
@@ -38,6 +52,10 @@ export default function ParentDashboard({
 
   useEffect(() => {
     fetchChildren();
+    fetchUnviewedCount();
+    // Odśwież co minutę
+    const interval = setInterval(fetchUnviewedCount, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -57,6 +75,15 @@ export default function ParentDashboard({
       key: "attendance",
       icon: <CheckSquareOutlined />,
       label: "Historia obecności",
+    },
+    {
+      key: "communication",
+      icon: <MessageOutlined />,
+      label: (
+        <Badge count={unviewedCount} offset={[10, 0]}>
+          Komunikacja
+        </Badge>
+      ),
     },
     {
       key: "settings",
@@ -244,6 +271,29 @@ export default function ParentDashboard({
                 })()}
               </div>
             )}
+          </div>
+        )}
+        {activeTab === "communication" && (
+          <div>
+            <Tabs
+              defaultActiveKey={unviewedCount > 0 ? "announcements" : "messages"}
+              items={[
+                {
+                  key: "messages",
+                  label: "💬 Wiadomości",
+                  children: <MessagesView />,
+                },
+                {
+                  key: "announcements",
+                  label: (
+                    <Badge count={unviewedCount} offset={[10, 0]}>
+                      📢 Ogłoszenia
+                    </Badge>
+                  ),
+                  children: <AnnouncementsView onAnnouncementsViewed={fetchUnviewedCount} />,
+                },
+              ]}
+            />
           </div>
         )}
         {activeTab === "settings" && <SettingsPage />}

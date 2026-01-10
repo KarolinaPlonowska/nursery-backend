@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Table, message, Collapse, Menu, Layout, Select } from "antd";
-import { LogoutOutlined, TeamOutlined, SettingOutlined, CheckSquareOutlined } from "@ant-design/icons";
+import { Card, Button, Table, message, Collapse, Menu, Layout, Select, Tabs, Badge } from "antd";
+import { LogoutOutlined, TeamOutlined, SettingOutlined, CheckSquareOutlined, MessageOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
 import SettingsPage from "./SettingsPage";
 import AttendanceView from "../components/AttendanceView";
+import MessagesView from "../components/MessagesView";
+import AnnouncementsView from "../components/AnnouncementsView";
 
 const { Header, Content } = Layout;
 const API_URL = "http://localhost:3000";
@@ -20,6 +22,18 @@ export default function CaregiverDashboard({
   const [selectedGroupForAttendance, setSelectedGroupForAttendance] = useState<string | null>(null);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [unviewedCount, setUnviewedCount] = useState(0);
+
+  const fetchUnviewedCount = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/announcements/unviewed/count`, {
+        withCredentials: true,
+      });
+      setUnviewedCount(res.data.count);
+    } catch (err) {
+      console.error('Failed to fetch unviewed count:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchMyGroups = async () => {
@@ -36,6 +50,10 @@ export default function CaregiverDashboard({
       }
     };
     fetchMyGroups();
+    fetchUnviewedCount();
+    // Odśwież co minutę
+    const interval = setInterval(fetchUnviewedCount, 60000);
+    return () => clearInterval(interval);
   }, []);
 useEffect(() => {
     // Automatycznie wybierz pierwszą grupę dla widoku obecności
@@ -54,6 +72,15 @@ useEffect(() => {
       key: "attendance",
       icon: <CheckSquareOutlined />,
       label: "Lista obecności",
+    },
+    {
+      key: "communication",
+      icon: <MessageOutlined />,
+      label: (
+        <Badge count={unviewedCount} offset={[10, 0]}>
+          Komunikacja
+        </Badge>
+      ),
     },
     {
       key: "settings",
@@ -270,6 +297,29 @@ useEffect(() => {
                 })()}
               </div>
             )}
+          </div>
+        )}
+        {activeTab === "communication" && (
+          <div>
+            <Tabs
+              defaultActiveKey={unviewedCount > 0 ? "announcements" : "messages"}
+              items={[
+                {
+                  key: "messages",
+                  label: "💬 Wiadomości",
+                  children: <MessagesView />,
+                },
+                {
+                  key: "announcements",
+                  label: (
+                    <Badge count={unviewedCount} offset={[10, 0]}>
+                      📢 Ogłoszenia
+                    </Badge>
+                  ),
+                  children: <AnnouncementsView onAnnouncementsViewed={fetchUnviewedCount} />,
+                },
+              ]}
+            />
           </div>
         )}
         {activeTab === "settings" && <SettingsPage />}
