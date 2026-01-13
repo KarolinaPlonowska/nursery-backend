@@ -29,7 +29,10 @@ export default function LandingPage() {
       <div>
         <div className="landing-hero">
           <div className="hero-content">
-            <h1 className="hero-title"><ScheduleOutlined style={{ marginRight: 12 }} />Nursery Management System</h1>
+            <h1 className="hero-title" style={{ color: "#FBBF24" }}>
+              <ScheduleOutlined style={{ marginRight: 12, color: "#FBBF24" }} />
+              Żłobek Online
+            </h1>
             <p className="hero-subtitle">
               Nowoczesny system zarządzania przedszkolem dla rodziców, opiekunów i administratorów
             </p>

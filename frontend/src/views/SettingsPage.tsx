@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, Form, Input, Button, Divider, App, Modal } from "antd";
-import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { LockOutlined, MailOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
@@ -138,7 +138,9 @@ export default function SettingsPage() {
         }}
         title={
           <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
-            📋 Informacje o koncie
+            <span>
+              <InfoCircleOutlined style={{ color: isDark ? "#FBBF24" : "#7C3AED", marginRight: 8 }} /> Informacje o koncie
+            </span>
           </span>
         }
       >

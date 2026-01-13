@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, Button, Table, message, Menu, Layout, Select, Space, Tabs, Badge } from "antd";
-import { LogoutOutlined, TeamOutlined, SettingOutlined, CheckSquareOutlined, MessageOutlined } from "@ant-design/icons";
+import { LogoutOutlined, TeamOutlined, SettingOutlined, CheckSquareOutlined, MessageOutlined, SoundOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
 import SettingsPage from "./SettingsPage";
@@ -81,7 +81,7 @@ export default function ParentDashboard({
       icon: <MessageOutlined />,
       label: (
         <Badge count={unviewedCount} offset={[10, 0]}>
-          Komunikacja
+          <span style={{ color: "rgba(255, 255, 255, 0.85)" }}>Komunikacja</span>
         </Badge>
       ),
     },
@@ -151,7 +151,11 @@ export default function ParentDashboard({
                 border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
                 background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👶 Twoje dzieci</span>}
+              title={
+                <span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  <TeamOutlined style={{ color: "#FBBF24", marginRight: 8 }} /> Twoje dzieci
+                </span>
+              }
             >
           <Table
             dataSource={children}
@@ -280,14 +284,20 @@ export default function ParentDashboard({
               items={[
                 {
                   key: "messages",
-                  label: "💬 Wiadomości",
+                  label: (
+                    <span>
+                      <MessageOutlined style={{ marginRight: 8 }} /> Wiadomości
+                    </span>
+                  ),
                   children: <MessagesView />,
                 },
                 {
                   key: "announcements",
                   label: (
                     <Badge count={unviewedCount} offset={[10, 0]}>
-                      📢 Ogłoszenia
+                      <span>
+                        <SoundOutlined style={{ marginRight: 8 }} /> Ogłoszenia
+                      </span>
                     </Badge>
                   ),
                   children: <AnnouncementsView onAnnouncementsViewed={fetchUnviewedCount} />,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, List, Button, Modal, Form, Input, Select, Empty, Spin, App, Tag } from "antd";
-import { NotificationOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined, SoundOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
@@ -13,7 +13,7 @@ interface Announcement {
   content: string;
   priority: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
   createdAt: string;
-  author: { firstName: string; lastName: string; role: string };
+  author: { id: string; firstName: string; lastName: string; role: string };
   group?: { name: string };
 }
 
@@ -48,49 +48,45 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
     }
   }, []);
 
-  const markAllAsViewed = async (announcementsList: Announcement[]) => {
-    console.log('markAllAsViewed called with', announcementsList.length, 'announcements');
-    if (announcementsList.length === 0) return;
+  const markAllAsViewed = async () => {
+    if (announcements.length === 0) {
+      message.info("Brak ogłoszeń do oznaczenia");
+      return;
+    }
     
     try {
       // Oznacz każde ogłoszenie jako przeczytane
-      const promises = announcementsList.map(ann =>
+      const promises = announcements.map(ann =>
         axios.patch(
           `${API_URL}/announcements/${ann.id}/view`,
           {},
           { withCredentials: true }
-        ).catch((err) => {
-          console.error(`Failed to mark ${ann.id} as viewed:`, err);
-        })
+        )
       );
       
       await Promise.all(promises);
-      console.log('All announcements marked as viewed');
+      message.success("Wszystkie ogłoszenia oznaczone jako przeczytane");
+      
+      // Dodaj krótkie opóźnienie aby backend zdążył przetworzyć zmiany
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Odśwież licznik w dashboardzie po wszystkich operacjach
       if (onAnnouncementsViewed) {
-        console.log('Calling onAnnouncementsViewed callback');
         onAnnouncementsViewed();
-      } else {
-        console.log('No onAnnouncementsViewed callback provided');
       }
     } catch (err) {
       console.error('Failed to mark announcements as viewed:', err);
+      message.error("Błąd podczas oznaczania ogłoszeń");
     }
   };
 
   const fetchAnnouncements = async () => {
-    console.log('fetchAnnouncements called');
     setLoading(true);
     try {
       const res = await axios.get(`${API_URL}/announcements`, {
         withCredentials: true,
       });
-      console.log('Fetched announcements:', res.data.length);
-      console.log('Announcement data:', res.data);
       setAnnouncements(res.data);
-      // Oznacz jako przeczytane po pobraniu
-      await markAllAsViewed(res.data);
     } catch (err: any) {
       message.error(err?.response?.data?.message || "Błąd pobierania ogłoszeń");
     } finally {
@@ -155,21 +151,40 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
           border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
           background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
         }}
-        title={<span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>📢 Ogłoszenia</span>}
+        title={
+          <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
+            <SoundOutlined style={{ marginRight: 8 }} /> Ogłoszenia
+          </span>
+        }
         extra={
-          canCreate && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setModalVisible(true)}
-              style={{
-                background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)",
-                border: "none",
-              }}
-            >
-              Dodaj ogłoszenie
-            </Button>
-          )
+          <div style={{ display: 'flex', gap: 8 }}>
+            {announcements.length > 0 && (
+              <Button
+                type="default"
+                onClick={markAllAsViewed}
+                style={{
+                  background: isDark ? "#2a1f3d" : "#F3F4F6",
+                  border: isDark ? "1px solid #4a3a5a" : "1px solid #D1D5DB",
+                  color: isDark ? "#FBBF24" : "#7C3AED",
+                }}
+              >
+                ✓ Oznacz wszystkie jako przeczytane
+              </Button>
+            )}
+            {canCreate && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => setModalVisible(true)}
+                style={{
+                  background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)",
+                  border: "none",
+                }}
+              >
+                Dodaj ogłoszenie
+              </Button>
+            )}
+          </div>
         }
       >
         {loading ? (
@@ -177,14 +192,12 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
         ) : announcements.length === 0 ? (
           <Empty description="Brak ogłoszeń" />
         ) : (
-          <>
-            {console.log('Rendering List with announcements:', announcements)}
-            <List
-              dataSource={announcements}
-              renderItem={(ann) => (
+          <List
+            dataSource={announcements}
+            renderItem={(ann) => (
                 <List.Item
                   actions={
-                    (currentUser?.role === 'ADMIN' || (currentUser?.firstName === ann.author.firstName && currentUser?.lastName === ann.author.lastName)) ? [
+                    (currentUser?.role === 'ADMIN' || (currentUser?.id === ann.author.id && currentUser?.role !== 'PARENT')) ? [
                       <Button
                         type="text"
                         danger
@@ -236,7 +249,6 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
               </List.Item>
             )}
           />
-          </>
         )}
       </Card>
 

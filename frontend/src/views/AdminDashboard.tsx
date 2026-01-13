@@ -8,6 +8,13 @@ import {
   SettingOutlined,
   BarChartOutlined,
   MessageOutlined,
+  PlusOutlined,
+  EditOutlined,
+  HomeOutlined,
+  UserAddOutlined,
+  LinkOutlined,
+  ExclamationCircleOutlined,
+  SoundOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
@@ -62,18 +69,27 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     currentCaregiver: string;
   } | null>(null);
   const [unviewedCount, setUnviewedCount] = useState(0);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   const fetchUnviewedCount = async () => {
-    console.log('fetchUnviewedCount called');
     try {
       const res = await axios.get(`${API_URL}/announcements/unviewed/count`, {
         withCredentials: true,
       });
-      console.log('fetchUnviewedCount response:', res.data);
       setUnviewedCount(res.data.count);
-      console.log('setUnviewedCount called with:', res.data.count);
     } catch (err) {
       console.error('Failed to fetch unviewed count:', err);
+    }
+  };
+
+  const fetchUnreadMessagesCount = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/messages/unread-count`, {
+        withCredentials: true,
+      });
+      setUnreadMessagesCount(res.data.count);
+    } catch (err) {
+      console.error('Failed to fetch unread messages count:', err);
     }
   };
 
@@ -109,8 +125,12 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   useEffect(() => {
     fetchData();
     fetchUnviewedCount();
+    fetchUnreadMessagesCount();
     // Odśwież co minutę
-    const interval = setInterval(fetchUnviewedCount, 60000);
+    const interval = setInterval(() => {
+      fetchUnviewedCount();
+      fetchUnreadMessagesCount();
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -409,8 +429,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               key: "communication",
               icon: <MessageOutlined />,
               label: (
-                <Badge count={unviewedCount} offset={[10, 0]}>
-                  Komunikacja
+                <Badge count={unviewedCount + unreadMessagesCount} offset={[10, 0]}>
+                  <span style={{ color: "rgba(255, 255, 255, 0.85)" }}>Komunikacja</span>
                 </Badge>
               )
             },
@@ -447,7 +467,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
                 background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👥 Użytkownicy</span>}
+              title={
+                <span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  <TeamOutlined style={{ color: "#FBBF24", marginRight: 8 }} /> Użytkownicy
+                </span>
+              }
             >
             <Table
               dataSource={users}
@@ -561,7 +585,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
                 background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>➕ Utwórz konto administratora</span>}
+              title={
+                <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
+                  <UserAddOutlined style={{ marginRight: 8 }} /> Utwórz konto administratora
+                </span>
+              }
             >
             <Form
               form={adminForm}
@@ -648,7 +676,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
                 background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👶 Dzieci</span>}
+              title={
+                <span style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  <TeamOutlined style={{ color: "#FBBF24", marginRight: 8 }} /> Dzieci
+                </span>
+              }
             >
             <Table
               dataSource={children}
@@ -724,7 +756,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
                 background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>➕ Dodaj nowe dziecko</span>}
+              title={
+                <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
+                  <PlusOutlined style={{ marginRight: 8 }} /> Dodaj nowe dziecko
+                </span>
+              }
             >
             <Form
               form={childForm}
@@ -799,7 +835,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 border: isDark ? "1px solid #4a3a5a" : "1px solid #E5E7EB",
                 background: isDark ? "linear-gradient(135deg, #1a1230 0%, #1f1838 100%)" : undefined
               }}
-              title={<span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>🎯 Przypisz dziecko do grupy</span>}
+              title={
+                <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
+                  <LinkOutlined style={{ marginRight: 8 }} /> Przypisz dziecko do grupy
+                </span>
+              }
             >
             <Form
               layout="inline"
@@ -845,7 +885,9 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         )}
         {activeTab === "groups" && (
           <div style={{ width: "100%" }}>
-            <h3 style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 16 }}>🏫 Grupy</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 700, background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 16 }}>
+              <HomeOutlined style={{ color: "#FBBF24", marginRight: 8 }} /> Grupy
+            </h3>
             <Table
               dataSource={groups}
               rowKey="id"
@@ -931,7 +973,15 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               ]}
             />
             <h3 style={{ marginTop: 32, fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
-              {editingGroup ? "✏️ Edytuj grupę" : "➕ Utwórz nową grupę"}
+              {editingGroup ? (
+                <>
+                  <EditOutlined style={{ marginRight: 8 }} /> Edytuj grupę
+                </>
+              ) : (
+                <>
+                  <PlusOutlined style={{ marginRight: 8 }} /> Utwórz nową grupę
+                </>
+              )}
             </h3>
             <Form
               form={groupForm}
@@ -970,14 +1020,22 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               items={[
                 {
                   key: "messages",
-                  label: "💬 Wiadomości",
-                  children: <MessagesView />,
+                  label: (
+                    <Badge count={unreadMessagesCount} offset={[10, 0]}>
+                      <span>
+                        <MessageOutlined style={{ marginRight: 8 }} /> Wiadomości
+                      </span>
+                    </Badge>
+                  ),
+                  children: <MessagesView onMessagesUpdate={fetchUnreadMessagesCount} />,
                 },
                 {
                   key: "announcements",
                   label: (
                     <Badge count={unviewedCount} offset={[10, 0]}>
-                      📢 Ogłoszenia
+                      <span>
+                        <SoundOutlined style={{ marginRight: 8 }} /> Ogłoszenia
+                      </span>
                     </Badge>
                   ),
                   children: <AnnouncementsView onAnnouncementsViewed={fetchUnviewedCount} />,
@@ -990,7 +1048,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       
       {/* Confirm role change modal */}
       <Modal
-        title="⚠️ Potwierdź zmianę roli"
+        title={
+          <span>
+            <ExclamationCircleOutlined style={{ color: "#F59E0B", marginRight: 8 }} /> Potwierdź zmianę roli
+          </span>
+        }
         open={!!confirmRoleChange}
         onOk={async () => {
           if (confirmRoleChange) {
@@ -1016,7 +1078,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       </Modal>
 
       <Modal
-        title="⚠️ Potwierdź usunięcie"
+        title={
+          <span>
+            <ExclamationCircleOutlined style={{ color: "#DC2626", marginRight: 8 }} /> Potwierdź usunięcie
+          </span>
+        }
         open={!!confirmDeleteUser}
         onOk={() => {
           if (confirmDeleteUser) {
@@ -1043,7 +1109,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
       {/* Confirm child delete modal */}
       <Modal
-        title="⚠️ Potwierdź usunięcie dziecka"
+        title={
+          <span>
+            <ExclamationCircleOutlined style={{ color: "#DC2626", marginRight: 8 }} /> Potwierdź usunięcie dziecka
+          </span>
+        }
         open={!!confirmDeleteChild}
         onOk={async () => {
           if (confirmDeleteChild) {
@@ -1068,7 +1138,11 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
       {/* Confirm caregiver change modal */}
       <Modal
-        title="⚠️ Potwierdź zmianę opiekuna"
+        title={
+          <span>
+            <ExclamationCircleOutlined style={{ color: "#F59E0B", marginRight: 8 }} /> Potwierdź zmianę opiekuna
+          </span>
+        }
         open={!!confirmChangeCaregiverModal}
         onOk={async () => {
           if (confirmChangeCaregiverModal) {

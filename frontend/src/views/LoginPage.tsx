@@ -75,9 +75,9 @@ export default function LoginPage() {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <LoginOutlined style={{ fontSize: 40, color: "#7C3AED", marginBottom: 16 }} />
-          <h1 style={{ fontSize: 28, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700, margin: 0 }}>Zaloguj się</h1>
-          <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginTop: 8 }}>Dostęp do systemu zarządzania przedszkolem</p>
+          <LoginOutlined style={{ fontSize: 40, color: "#FBBF24", marginBottom: 16 }} />
+          <h1 style={{ fontSize: 28, color: "#FBBF24", fontWeight: 700, margin: 0 }}>Żłobek online</h1>
+          <p style={{ color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginTop: 8 }}>Dostęp do systemu zarządzania żłobkiem</p>
         </div>
 
         {logoutMessage && (

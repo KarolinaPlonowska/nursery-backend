@@ -216,7 +216,7 @@ export default function App() {
             </Routes>
           </Content>
           <Footer style={{ textAlign: "center" }}>
-            Nursery Management System ©2025
+            Żłobek Online ©2026 - System zarządzania żłobkiem
           </Footer>
         </Layout>
 
