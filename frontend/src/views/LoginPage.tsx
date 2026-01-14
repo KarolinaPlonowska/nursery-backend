@@ -6,7 +6,7 @@ import axios from "axios";
 import { setUser, getLogoutReason } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
 
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();

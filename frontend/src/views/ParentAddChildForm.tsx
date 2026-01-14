@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Form, Input, DatePicker, Button, message } from "antd";
 import axios from "axios";
 
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 export default function ParentAddChildForm({
   onChildAdded,

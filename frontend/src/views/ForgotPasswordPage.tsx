@@ -5,7 +5,7 @@ import { MailOutlined, HomeOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
 
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 type FormStep = "email" | "code" | "password";
 

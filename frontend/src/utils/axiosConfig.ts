@@ -1,11 +1,12 @@
 import axios from 'axios';
+import { API_URL } from '../config/api';
 
 // Skonfiguruj axios aby automatycznie wysyłał cookies
 axios.defaults.withCredentials = true;
 
 // Ustaw domyślny URL API
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: API_URL,
   withCredentials: true, // Wysyłaj cookies z każdym requestem
   headers: {
     'Content-Type': 'application/json',

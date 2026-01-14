@@ -6,7 +6,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 const { TextArea } = Input;
 const { Option } = Select;
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 interface Child {
   id: string;

@@ -5,7 +5,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useTheme } from "../hooks/useTheme";
 
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 const validatePasswordStrength = (password: string) => {
   const requirements = {

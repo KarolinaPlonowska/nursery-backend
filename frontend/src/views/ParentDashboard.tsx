@@ -10,7 +10,7 @@ import AnnouncementsView from "../components/AnnouncementsView";
 
 const { Header, Content } = Layout;
 
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 export default function ParentDashboard({
   onLogout,

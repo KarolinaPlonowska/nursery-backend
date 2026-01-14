@@ -8,7 +8,7 @@ import isBetween from "dayjs/plugin/isBetween";
 dayjs.extend(isBetween);
 
 const { RangePicker } = DatePicker;
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 interface AttendanceRecord {
   id: string;

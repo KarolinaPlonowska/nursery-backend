@@ -4,7 +4,7 @@ import { CheckOutlined, CloseOutlined, MedicineBoxOutlined, TeamOutlined } from 
 import axios from "axios";
 import dayjs from "dayjs";
 
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 interface AttendanceStats {
   childId: string;

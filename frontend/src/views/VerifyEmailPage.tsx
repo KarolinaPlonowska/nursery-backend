@@ -5,7 +5,7 @@ import { CheckCircleOutlined, MailOutlined, HomeOutlined } from "@ant-design/ico
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
 
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 export default function VerifyEmailPage() {
   const navigate = useNavigate();
