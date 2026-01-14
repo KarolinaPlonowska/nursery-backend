@@ -32,8 +32,6 @@ services:
         sync: false
       - key: EMAIL_PASS
         sync: false
-    buildCommand: npm ci && npm run build
-    startCommand: npm run start:prod
     healthCheckPath: /
 
   # Frontend Static Site
@@ -41,7 +39,6 @@ services:
     name: nursery-frontend
     runtime: static
     plan: free
-    region: frankfurt
     branch: main
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: ./frontend/dist
