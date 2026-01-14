@@ -2,11 +2,10 @@ services:
   # Backend API
   - type: web
     name: nursery-backend
-    runtime: docker
-    region: frankfurt
+    runtime: node
     branch: master
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    buildCommand: cd backend && npm ci && npm run build
+    startCommand: cd backend && npm run start:prod
     envVars:
       - key: NODE_ENV
         value: production
@@ -53,4 +52,3 @@ databases:
     databaseName: nursery_db
     user: nursery_user
     plan: free
-    region: frankfurt
