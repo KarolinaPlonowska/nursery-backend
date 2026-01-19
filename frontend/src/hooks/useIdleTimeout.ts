@@ -15,9 +15,9 @@ export const useIdleTimeout = ({
   const [showWarning, setShowWarning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const warningTimeoutRef = useRef<number | null>(null);
+  const countdownRef = useRef<number | null>(null);
 
   const resetTimer = () => {
     setIsIdle(false);
@@ -36,12 +36,12 @@ export const useIdleTimeout = ({
     }
 
     // Ustaw timer ostrzeżenia
-    warningTimeoutRef.current = setTimeout(() => {
+    warningTimeoutRef.current = window.setTimeout(() => {
       setShowWarning(true);
       setTimeLeft(warningTime / 1000); // konwertuj na sekundy
 
       // Odliczanie
-      countdownRef.current = setInterval(() => {
+      countdownRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             if (countdownRef.current) clearInterval(countdownRef.current);
@@ -53,7 +53,7 @@ export const useIdleTimeout = ({
     }, idleTime - warningTime);
 
     // Ustaw timer wylogowania
-    timeoutRef.current = setTimeout(() => {
+    timeoutRef.current = window.setTimeout(() => {
       setIsIdle(true);
       onIdle();
     }, idleTime);

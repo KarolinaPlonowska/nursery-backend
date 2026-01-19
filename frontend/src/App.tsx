@@ -32,9 +32,9 @@ export default function App() {
   // Stan dla ostrzeżenia o bezczynności
   const [showWarning, setShowWarning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const warningTimeoutRef = useRef<number | null>(null);
+  const countdownRef = useRef<number | null>(null);
   const isWarningShownRef = useRef(false);
 
   const IDLE_TIME = 30 * 60 * 1000; // 30 minut bezczynności
@@ -54,14 +54,14 @@ export default function App() {
     if (!isLoggedIn) return;
 
     // Timer ostrzeżenia
-    warningTimeoutRef.current = setTimeout(() => {
+    warningTimeoutRef.current = window.setTimeout(() => {
       console.log('Pokazuję ostrzeżenie o bezczynności');
       isWarningShownRef.current = true;
       setShowWarning(true);
       setTimeLeft(WARNING_TIME / 1000);
 
       // Odliczanie
-      countdownRef.current = setInterval(() => {
+      countdownRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             if (countdownRef.current) clearInterval(countdownRef.current);
@@ -73,7 +73,7 @@ export default function App() {
     }, IDLE_TIME - WARNING_TIME);
 
     // Timer wylogowania
-    timeoutRef.current = setTimeout(() => {
+    timeoutRef.current = window.setTimeout(() => {
       console.log('Automatyczne wylogowanie z powodu bezczynności');
       setShowWarning(false);
       logout(navigate, 'Zostałeś wylogowany z powodu braku aktywności.');
