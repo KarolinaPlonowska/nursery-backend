@@ -13,9 +13,10 @@ import ParentDashboard from "./views/ParentDashboard";
 import CaregiverDashboard from "./views/CaregiverDashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import ThemeToggle from "./components/ThemeToggle";
-import { logout, getUserRole, getToken } from "./utils/auth";
+import { logout, getUserRole, getUser } from "./utils/auth";
 import { useTheme } from "./hooks/useTheme";
 import { useEffect, useRef, useState } from "react";
+import apiClient from "./utils/axiosConfig";
 
   const { Header, Content, Footer } = Layout;
 
@@ -25,8 +26,46 @@ export default function App() {
   const { theme: currentTheme } = useTheme();
   const isLandingPage = location.pathname === "/";
   const isAuthPage = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/verify-email" || location.pathname === "/forgot-password";
-  const isLoggedIn = !!getToken();
-  const userRole = getUserRole();
+  
+  // State dla sprawdzania sesji
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
+
+  // Sprawdzanie ważności sesji przy ładowaniu
+  useEffect(() => {
+    const checkSession = async () => {
+      const user = getUser();
+      const role = getUserRole();
+      
+      if (user && role) {
+        try {
+          // Sprawdź czy sesja jest nadal ważna
+          await apiClient.get('/auth/profile', {
+            timeout: 5000
+          });
+          
+          setIsLoggedIn(true);
+          setUserRole(role);
+        } catch (error: any) {
+          // Sesja nieważna - wyloguj
+          console.log('Sesja nieważna, wylogowuję...');
+          sessionStorage.removeItem('user');
+          sessionStorage.removeItem('userRole');
+          sessionStorage.setItem('logoutReason', 'Sesja wygasła. Zaloguj się ponownie.');
+          setIsLoggedIn(false);
+          setUserRole(null);
+          
+          if (!isAuthPage && !isLandingPage) {
+            navigate('/login');
+          }
+        }
+      }
+      setSessionChecked(true);
+    };
+    
+    checkSession();
+  }, [location.pathname, navigate, isAuthPage, isLandingPage]);
 
   // AUTOMATYCZNE WYLOGOWANIE PO BEZCZYNNOŚCI
   // Stan dla ostrzeżenia o bezczynności
@@ -51,7 +90,7 @@ export default function App() {
     setShowWarning(false);
 
     // Tylko dla zalogowanych użytkowników
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || !sessionChecked) return;
 
     // Timer ostrzeżenia
     warningTimeoutRef.current = window.setTimeout(() => {
@@ -82,7 +121,7 @@ export default function App() {
 
   // Monitorowanie aktywności użytkownika
   useEffect(() => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || !sessionChecked) return;
 
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
     
@@ -106,7 +145,7 @@ export default function App() {
       if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
-  }, [isLoggedIn]);
+  }, [isLoggedIn, sessionChecked]);
 
   const handleContinue = () => {
     console.log('Użytkownik kliknął "Kontynuuj pracę"');
@@ -115,6 +154,28 @@ export default function App() {
     if (countdownRef.current) clearInterval(countdownRef.current);
     resetIdleTimer();
   };
+
+  // Pokaż loader podczas sprawdzania sesji
+  if (!sessionChecked) {
+    return (
+      <ConfigProvider
+        theme={{
+          algorithm: currentTheme === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
+        }}
+      >
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '100vh',
+          fontSize: '16px',
+          color: currentTheme === 'dark' ? '#fff' : '#000'
+        }}>
+          Sprawdzanie sesji...
+        </div>
+      </ConfigProvider>
+    );
+  }
 
   return (
     <ConfigProvider

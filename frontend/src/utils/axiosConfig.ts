@@ -60,10 +60,15 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         // Jeśli refresh nie zadziałał, wyloguj użytkownika
         processQueue(refreshError, null);
+        
+        // Wyczyść wszystkie dane sesji
         localStorage.removeItem('user');
         localStorage.removeItem('role');
         sessionStorage.removeItem('user');
-        sessionStorage.removeItem('role');
+        sessionStorage.removeItem('userRole');
+        sessionStorage.setItem('logoutReason', 'Sesja wygasła. Zaloguj się ponownie.');
+        
+        // Przekieruj na stronę logowania
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }

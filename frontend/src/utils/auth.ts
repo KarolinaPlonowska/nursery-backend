@@ -1,3 +1,5 @@
+import { API_URL } from "../config/api";
+
 export function getToken() {
   // Token jest teraz w httpOnly cookie, nie w localStorage
   // Frontend nie może go bezpośrednio odczytać dla bezpieczeństwa
@@ -38,9 +40,26 @@ export function logout(navigate: any, reason?: string) {
   sessionStorage.removeItem('user');
   sessionStorage.removeItem('userRole');
   
+  // Usuń także z localStorage dla pewności (fallback compatibility)
+  localStorage.removeItem('user');
+  localStorage.removeItem('role');
+  localStorage.removeItem('token');
+  
   // Zapisz powód wylogowania jeśli podany
   if (reason) {
     sessionStorage.setItem('logoutReason', reason);
+  }
+  
+  // Wyślij żądanie logout na backend aby wyczyścić cookies
+  try {
+    fetch(`${API_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    }).catch(() => {
+      // Ignoruj błędy - i tak robimy lokalny logout
+    });
+  } catch (error) {
+    // Ignoruj błędy - i tak robimy lokalny logout
   }
   
   navigate('/login');
