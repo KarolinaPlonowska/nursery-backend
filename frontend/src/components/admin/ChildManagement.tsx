@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Table, Select, Button, Form, Input, DatePicker, message } from 'antd';
-import { TeamOutlined, PlusOutlined, LinkOutlined } from '@ant-design/icons';
+import { Card, Table, Select, Button, Form, Input, DatePicker, message, App } from 'antd';
+import { TeamOutlined, PlusOutlined, LinkOutlined, ExclamationCircleOutlined, WarningOutlined, CloseOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Option } = Select;
@@ -71,6 +71,7 @@ const ChildManagement: React.FC<ChildManagementProps> = ({
   onChildUpdate
 }) => {
   const [childForm] = Form.useForm();
+  const { modal } = App.useApp();
 
   const handleAddChild = async (values: any) => {
     setCreatingChild(true);
@@ -111,6 +112,58 @@ const ChildManagement: React.FC<ChildManagementProps> = ({
     } finally {
       setUpdatingChildGroupId(null);
     }
+  };
+
+  const confirmGroupChange = (childId: string, groupId: string | null) => {
+    const child = children.find(c => c.id === childId);
+    const currentGroupName = child?.group?.name;
+    const newGroupName = groupId ? groups.find(g => g.id === groupId)?.name : null;
+    const childName = child ? `${child.firstName} ${child.lastName}` : 'dziecko';
+
+    modal.confirm({
+      title: 'Zmiana grupy dziecka',
+      icon: <ExclamationCircleOutlined />,
+      content: (
+        <div>
+          <p>Czy na pewno chcesz zmienić grupę dla dziecka <strong>{childName}</strong>?</p>
+          {currentGroupName && (
+            <div style={{ 
+              background: '#fff7e6', 
+              border: '1px solid #ffd591', 
+              borderRadius: 6, 
+              padding: 12, 
+              marginTop: 12 
+            }}>
+              <p style={{ color: '#d46b08', margin: 0, fontWeight: 600 }}>
+                <WarningOutlined style={{ color: '#d46b08', marginRight: 8 }} />Aktualna grupa: {currentGroupName}
+              </p>
+            </div>
+          )}
+          {newGroupName ? (
+            <p style={{ color: '#52c41a', marginTop: 12 }}>
+              <strong>Nowa grupa:</strong> {newGroupName}
+            </p>
+          ) : (
+            <p style={{ color: '#ff4d4f', marginTop: 12 }}>
+              <strong>Dziecko zostanie usunięte z grupy</strong>
+            </p>
+          )}
+          <p style={{ color: '#8c8c8c', fontSize: '12px', marginTop: 12 }}>
+            Ta operacja może wpłynąć na obecność, komunikaty i inne funkcje związane z grupą.
+          </p>
+        </div>
+      ),
+      okText: 'Zmień grupę',
+      okType: 'primary',
+      cancelText: 'Anuluj',
+      onOk: async () => {
+        await handleSetChildGroup(childId, groupId);
+      },
+      onCancel: () => {
+        // Reset select value to current group
+        // This will be handled by the component re-render
+      }
+    });
   };
 
   const handleAssign = async () => {
@@ -188,8 +241,11 @@ const ChildManagement: React.FC<ChildManagementProps> = ({
                   allowClear
                   loading={updatingChildGroupId === record.id}
                   disabled={updatingChildGroupId === record.id}
-                  onChange={(val) => handleSetChildGroup(record.id, val || null)}
+                  onChange={(val) => confirmGroupChange(record.id, val || null)}
                 >
+                  <Option value={null} style={{ color: '#ff4d4f' }}>
+                    <CloseOutlined style={{ marginRight: 4 }} />Usuń z grupy
+                  </Option>
                   {groups.map((group: Group) => (
                     <Option key={group.id} value={group.id}>{group.name}</Option>
                   ))}

@@ -265,7 +265,7 @@ export default function MessagesView({ onMessagesUpdate }: MessagesViewProps = {
                   title={
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                       <span style={{ color: isDark ? "#fff" : "#000" }}>
-                        {conv.firstName} {conv.lastName}
+                        {conv.firstName || 'Użytkownik'} {conv.lastName || 'usunięty'}
                       </span>
                       {conv.unreadCount > 0 && (
                         <span style={{
@@ -305,7 +305,7 @@ export default function MessagesView({ onMessagesUpdate }: MessagesViewProps = {
         title={
           selectedConversation ? (
             <span style={{ fontSize: 18, fontWeight: 700, color: isDark ? "#FBBF24" : "#7C3AED" }}>
-              {selectedConversation.firstName} {selectedConversation.lastName}
+              {selectedConversation.firstName || 'Użytkownik'} {selectedConversation.lastName || 'usunięty'}
               <span style={{ fontSize: 12, color: isDark ? "#9CA3AF" : "#6B7280", marginLeft: 8 }}>
                 ({getRoleLabel(selectedConversation.role)})
               </span>
@@ -414,7 +414,7 @@ export default function MessagesView({ onMessagesUpdate }: MessagesViewProps = {
             }
             options={availableUsers.map(user => ({
               value: user.id,
-              label: `${user.firstName} ${user.lastName} (${getRoleLabel(user.role)})`,
+              label: `${user.firstName || 'Użytkownik'} ${user.lastName || 'usunięty'} (${getRoleLabel(user.role)})`,
             }))}
           />
         </div>

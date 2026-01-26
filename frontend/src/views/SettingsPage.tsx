@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, Form, Input, Button, Divider, App, Modal } from "antd";
-import { LockOutlined, MailOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { LockOutlined, MailOutlined, InfoCircleOutlined, SettingOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { getUser } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
@@ -124,7 +124,7 @@ export default function SettingsPage() {
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent"
       }}>
-        ⚙️ Ustawienia konta
+        <SettingOutlined style={{ color: '#FBBF24', marginRight: 8 }} /> Ustawienia konta
       </h2>
 
       {/* Account Info Card */}
@@ -305,7 +305,7 @@ export default function SettingsPage() {
 
       {/* Email Verification Modal */}
       <Modal
-        title="📧 Weryfikacja emaila"
+        title={<span><MailOutlined style={{ marginRight: 8 }} />Weryfikacja emaila</span>}
         open={verificationModalVisible}
         onCancel={() => {
           setVerificationModalVisible(false);

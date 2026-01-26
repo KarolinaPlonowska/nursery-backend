@@ -41,7 +41,6 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [activeTab, setActiveTab] = useState<string>("users");
   const [unviewedCount, setUnviewedCount] = useState(0);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
-  const [showInviteCode, setShowInviteCode] = useState(false);
   
   // State for user management
   const [roleUpdating, setRoleUpdating] = useState<string | null>(null);
@@ -116,10 +115,6 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       setUsers(usersRes.data);
       setChildren(childrenRes.data);
       setGroups(groupsRes.data);
-      
-      // Update invite code visibility
-      const adminCount = usersRes.data.filter((u: any) => u.role === 'ADMIN').length;
-      setShowInviteCode(adminCount === 0);
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to fetch data");
     } finally {
@@ -301,7 +296,6 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               isDark={isDark}
               creatingAdmin={creatingAdmin}
               setCreatingAdmin={setCreatingAdmin}
-              showInviteCode={showInviteCode}
               onAdminCreated={fetchData}
             />
           </div>

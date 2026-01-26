@@ -1,6 +1,6 @@
 import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
 import { Layout, Menu, ConfigProvider, theme as antTheme, App as AntApp, Modal } from "antd";
-import { UserOutlined, HomeOutlined, LogoutOutlined } from "@ant-design/icons";
+import { UserOutlined, HomeOutlined, LogoutOutlined, WarningOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import "./App.css";
 import LandingPage from "./views/LandingPage";
@@ -8,6 +8,7 @@ import LoginPage from "./views/LoginPage";
 import RegisterPage from "./views/RegisterPage";
 import VerifyEmailPage from "./views/VerifyEmailPage";
 import ForgotPasswordPage from "./views/ForgotPasswordPage";
+import AdminInvitationPage from "./views/AdminInvitationPage";
 import AdminDashboard from "./views/AdminDashboard";
 import ParentDashboard from "./views/ParentDashboard";
 import CaregiverDashboard from "./views/CaregiverDashboard";
@@ -25,7 +26,7 @@ export default function App() {
   const location = useLocation();
   const { theme: currentTheme } = useTheme();
   const isLandingPage = location.pathname === "/";
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/verify-email" || location.pathname === "/forgot-password";
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/verify-email" || location.pathname === "/forgot-password" || location.pathname.startsWith("/admin-invitation");
   
   // State dla sprawdzania sesji
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -250,6 +251,7 @@ export default function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/verify-email" element={<VerifyEmailPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/admin-invitation/:token" element={<AdminInvitationPage />} />
               <Route
                 path="/admin"
                 element={
@@ -284,7 +286,7 @@ export default function App() {
         {/* Modal ostrzeżenia o bezczynności */}
         <Modal
           open={showWarning}
-          title="⚠️ Ostrzeżenie o bezczynności"
+          title={<span><WarningOutlined style={{ color: '#faad14', marginRight: 8 }} />Ostrzeżenie o bezczynności</span>}
           onOk={handleContinue}
           onCancel={handleContinue}
           okText="Kontynuuj pracę"

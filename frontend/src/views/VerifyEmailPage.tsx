@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Card, Form, Input, Button, message, Alert, Spin } from "antd";
-import { CheckCircleOutlined, MailOutlined, HomeOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, MailOutlined, HomeOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
 
@@ -150,7 +150,7 @@ export default function VerifyEmailPage() {
 
         <div style={{ marginBottom: 24, padding: "12px", background: "#FEF3C7", borderRadius: 8, border: "1px solid #FCD34D" }}>
           <p style={{ color: "#92400E", fontSize: 13, margin: 0 }}>
-            ⏱️ Kod ważny przez 15 minut. Sprawdź folder spam jeśli nie widzisz emaila.
+            <ClockCircleOutlined style={{ color: '#faad14', marginRight: 8 }} />Kod ważny przez 15 minut. Sprawdź folder spam jeśli nie widzisz emaila.
           </p>
         </div>
 

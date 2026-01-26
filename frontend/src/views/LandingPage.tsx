@@ -93,7 +93,7 @@ export default function LandingPage() {
           <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: "0 auto" }}>
             <Col xs={24} sm={12} md={8}>
               <Card
-                bordered={false}
+                variant="borderless"
                 style={{
                   textAlign: "center",
                   borderRadius: 12,
@@ -114,7 +114,7 @@ export default function LandingPage() {
 
             <Col xs={24} sm={12} md={8}>
               <Card
-                bordered={false}
+                variant="borderless"
                 style={{
                   textAlign: "center",
                   borderRadius: 12,
@@ -135,7 +135,7 @@ export default function LandingPage() {
 
             <Col xs={24} sm={12} md={8}>
               <Card
-                bordered={false}
+                variant="borderless"
                 style={{
                   textAlign: "center",
                   borderRadius: 12,
@@ -156,7 +156,7 @@ export default function LandingPage() {
 
             <Col xs={24} sm={12} md={8}>
               <Card
-                bordered={false}
+                variant="borderless"
                 style={{
                   textAlign: "center",
                   borderRadius: 12,
@@ -177,7 +177,7 @@ export default function LandingPage() {
 
             <Col xs={24} sm={12} md={8}>
               <Card
-                bordered={false}
+                variant="borderless"
                 style={{
                   textAlign: "center",
                   borderRadius: 12,
@@ -198,7 +198,7 @@ export default function LandingPage() {
 
             <Col xs={24} sm={12} md={8}>
               <Card
-                bordered={false}
+                variant="borderless"
                 style={{
                   textAlign: "center",
                   borderRadius: 12,

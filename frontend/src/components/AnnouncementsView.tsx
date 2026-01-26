@@ -11,7 +11,7 @@ interface Announcement {
   id: string;
   title: string;
   content: string;
-  priority: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
+  priority: 'NORMAL' | 'URGENT';
   createdAt: string;
   author: { id: string; firstName: string; lastName: string; role: string };
   group?: { name: string };
@@ -137,9 +137,7 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
   };
 
   const priorityColors = {
-    LOW: { color: "#10B981", label: "Niski" },
     NORMAL: { color: "#3B82F6", label: "Normalny" },
-    HIGH: { color: "#F59E0B", label: "Wysoki" },
     URGENT: { color: "#EF4444", label: "Pilne" },
   };
 
@@ -197,7 +195,7 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
             renderItem={(ann) => (
                 <List.Item
                   actions={
-                    (currentUser?.role === 'ADMIN' || (currentUser?.id === ann.author.id && currentUser?.role !== 'PARENT')) ? [
+                    (currentUser?.role === 'ADMIN' || (ann.author && currentUser?.id === ann.author.id && currentUser?.role !== 'PARENT')) ? [
                       <Button
                         type="text"
                         danger
@@ -237,7 +235,10 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
                       </p>
                       <div style={{ fontSize: 12, color: isDark ? "#9CA3AF" : "#6B7280" }}>
                         <span>
-                          Autor: {ann.author.firstName} {ann.author.lastName} ({ann.author.role === 'ADMIN' ? 'Administrator' : 'Opiekun'})
+                          Autor: {ann.author ? 
+                            `${ann.author.firstName} ${ann.author.lastName} (${ann.author.role === 'ADMIN' ? 'Administrator' : 'Opiekun'})` 
+                            : 'Użytkownik usunięty'
+                          }
                         </span>
                         <span style={{ marginLeft: 16 }}>
                           {new Date(ann.createdAt).toLocaleString("pl-PL")}
@@ -285,9 +286,7 @@ export default function AnnouncementsView({ onAnnouncementsViewed }: Announcemen
             rules={[{ required: true }]}
           >
             <Select>
-              <Select.Option value="LOW">Niski</Select.Option>
               <Select.Option value="NORMAL">Normalny</Select.Option>
-              <Select.Option value="HIGH">Wysoki</Select.Option>
               <Select.Option value="URGENT">Pilne</Select.Option>
             </Select>
           </Form.Item>

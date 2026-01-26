@@ -23,6 +23,7 @@ export default function AttendanceStatistics() {
   const [children, setChildren] = useState<any[]>([]);
 
   const [stats, setStats] = useState<AttendanceStats[]>([]);
+  const [allAttendanceData, setAllAttendanceData] = useState<any[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [period, setPeriod] = useState<"week" | "month" | "all">("month");
 
@@ -35,6 +36,12 @@ export default function AttendanceStatistics() {
       fetchAttendanceData();
     }
   }, [children, period]);
+
+  useEffect(() => {
+    if (allAttendanceData.length > 0) {
+      calculateStats(allAttendanceData);
+    }
+  }, [selectedGroup, period, allAttendanceData]);
 
   const fetchInitialData = async () => {
     setLoading(true);
@@ -86,6 +93,7 @@ export default function AttendanceStatistics() {
         }))
       );
 
+      setAllAttendanceData(allAttendance);
       calculateStats(allAttendance);
     } catch (error: any) {
       message.error("Błąd pobierania danych obecności");
@@ -245,6 +253,7 @@ export default function AttendanceStatistics() {
               placeholder="Wszystkie grupy"
               allowClear
             >
+              <Select.Option value={null}>Wszystkie grupy</Select.Option>
               {groups.map(group => (
                 <Select.Option key={group.id} value={group.id}>
                   {group.name}

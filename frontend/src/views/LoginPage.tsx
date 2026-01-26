@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Form, Input, Button, message, Divider, Alert } from "antd";
+import { Card, Form, Input, Button, Divider, Alert, App } from "antd";
 import { LoginOutlined, HomeOutlined } from "@ant-design/icons";
-import axios from "axios";
+import apiClient from "../utils/axiosConfig";
 import { setUser, getLogoutReason } from "../utils/auth";
 import { useTheme } from "../hooks/useTheme";
-
-import { API_URL } from "../config/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,6 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [logoutMessage, setLogoutMessage] = useState<string | null>(null);
   const { theme } = useTheme();
+  const { message } = App.useApp();
   
   const isDark = theme === 'dark';
 
@@ -30,9 +29,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, values, {
-        withCredentials: true, // Istotne - wysłanie cookies
-      });
+      const res = await apiClient.post('/auth/login', values);
       
       // Debug - sprawdź odpowiedź z backendu
       console.log('Login response:', res.data);
