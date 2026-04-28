@@ -20,7 +20,6 @@ Comprehensive web application for managing nursery operations: users (admin, par
 - [Roles and User Flows](#roles-and-user-flows)
 - [Logging & Monitoring](#logging--monitoring)
 - [Deployment notes (Azure / Docker)](#deployment-notes-azure--docker)
-- [Demo script for presentation](#demo-script-for-presentation)
 - [Troubleshooting](#troubleshooting)
 - [Further improvements](#further-improvements)
 
@@ -197,15 +196,6 @@ All protected endpoints require `Authorization: Bearer <token>` header.
 - Use Azure Web App for Containers or Azure Container Instances / AKS for scalable deployment.
 - Configure secrets in Azure Key Vault and inject them as environment variables.
 - Use Application Gateway or Nginx as reverse proxy and enable HTTPS.
-
-## Demo script for presentation (7 min)
-
-1. Show login page — demonstrate validation errors.
-2. Login as `Parent` and go to Parent Dashboard.
-3. Add a child via the `Add Child` form — show validation and success flow.
-4. Show that the child appears in the list.
-5. Logout and login as `Admin` — show admin dashboard (user/group management).
-6. Mention security: JWT, RBAC, rate-limiter, hashed passwords.
 
 ## Troubleshooting
 
