@@ -34,7 +34,7 @@ export default function LandingPage() {
               Żłobek Online
             </h1>
             <p className="hero-subtitle">
-              Nowoczesny system zarządzania przedszkolem dla rodziców, opiekunów i administratorów
+              Nowoczesny system zarządzania żłobkiem dla rodziców, opiekunów i administratorów
             </p>
             <p className="hero-description">
               Łatwe zarządzanie dziećmi, grupami, obecnością i komunikacją między stronami
@@ -224,7 +224,7 @@ export default function LandingPage() {
           <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
             <h2 style={{ fontSize: 28, marginBottom: 20, color: isDark ? "rgba(255,255,255,0.87)" : "#1F2937", fontWeight: 700 }}>Gotowy do rozpoczęcia?</h2>
             <p style={{ fontSize: 16, color: isDark ? "rgba(255,255,255,0.6)" : "#6B7280", marginBottom: 40 }}>
-              Dołącz do nas już dziś i ułatw sobie zarządzanie przedszkolem
+              Dołącz do nas już dziś i ułatw sobie zarządzanie żłobkiem
             </p>
             <Button
               type="primary"
