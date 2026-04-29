@@ -248,7 +248,34 @@ Opiekun pracuje z przypisanymi grupami i dziećmi, a dostęp jest ograniczony do
 
 ## Screenshots / Zrzuty ekranu
 
-_Add screenshots here_ / _Dodaj tutaj zrzuty ekranu_
+<img width="808" height="790" alt="image" src="https://github.com/user-attachments/assets/84000352-9087-4311-927a-62e3d9f9c0b8" />
+
+<img width="912" height="907" alt="image" src="https://github.com/user-attachments/assets/a0c16fa6-5852-4e27-a847-3b8fa5988715" />
+
+<img width="825" height="930" alt="image" src="https://github.com/user-attachments/assets/7e9cded3-0b58-44fb-94ad-a70902646d46" />
+
+<img width="762" height="694" alt="image" src="https://github.com/user-attachments/assets/a4df2baa-b5f2-4c00-a7ea-5a6d5e219710" />
+
+<img width="977" height="985" alt="image" src="https://github.com/user-attachments/assets/2615355c-f7fa-411f-a69d-388592888967" />
+
+<img width="940" height="935" alt="image" src="https://github.com/user-attachments/assets/5a03bc96-10d5-4c8e-9bbf-3e19e6432683" />
+
+<img width="940" height="456" alt="image" src="https://github.com/user-attachments/assets/4b0a15a4-2369-4ef4-830d-eb2dd0391a1a" />
+
+<img width="940" height="475" alt="image" src="https://github.com/user-attachments/assets/896a3929-ba43-4f36-9889-1b462d0e727b" />
+
+<img width="930" height="438" alt="image" src="https://github.com/user-attachments/assets/bf251e9c-9990-41ce-abdb-88a495112419" />
+
+<img width="961" height="391" alt="image" src="https://github.com/user-attachments/assets/d21430ab-9480-4b85-8984-67a2b8f99bf5" />
+
+<img width="961" height="422" alt="image" src="https://github.com/user-attachments/assets/4e94bf65-a5f3-4a15-890b-9c42f640b57d" />
+
+<img width="874" height="539" alt="image" src="https://github.com/user-attachments/assets/c799bb61-6f69-4d80-87cf-9111ea442792" />
+
+<img width="509" height="964" alt="image" src="https://github.com/user-attachments/assets/aa470100-9046-4880-b63a-8df3356af60d" />
+
+<img width="635" height="1094" alt="image" src="https://github.com/user-attachments/assets/db459b25-4210-4254-81d0-1ab34875723e" />
+
 
 ## API Overview / Przegląd API
 
