@@ -38,7 +38,23 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Nie próbuj odświeżać tokenu dla endpointów autentykacji
+    const authEndpoints = [
+      '/auth/login', 
+      '/auth/register', 
+      '/auth/refresh-token',
+      '/auth/verify-email',
+      '/auth/resend-verification-code',
+      '/auth/request-password-reset',
+      '/auth/reset-password',
+      '/auth/create-admin',
+      '/auth/accept-admin-invitation'
+    ];
+    const isAuthEndpoint = authEndpoints.some(endpoint => 
+      originalRequest.url?.includes(endpoint)
+    );
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         // Jeśli refresh jest w toku, dodaj żądanie do kolejki
         return new Promise((resolve, reject) => {
