@@ -1,212 +1,302 @@
-# Nursery Management System
+# Nursery Management System / System Zarządzania Żłobkiem
 
-Comprehensive web application for managing nursery operations: users (admin, parent, caregiver), children, groups and attendance. This repo contains both backend (NestJS + TypeORM + PostgreSQL) and frontend (React + Ant Design) code.
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) ![Postgres](https://img.shields.io/badge/Postgres-336791?style=flat&logo=postgresql&logoColor=white)
 
----
+Deliver a safer, faster and more transparent childcare experience — a production-ready nursery management platform that combines a robust NestJS API with a modern React + Vite UI. Built with security, role-based workflows and observability in mind.
 
-## Table of Contents
+Dostarcz bezpieczne, szybkie i przejrzyste zarządzanie żłobkiem — gotowa do produkcji platforma łącząca stabilne API w NestJS z nowoczesnym interfejsem React + Vite. Zaprojektowana z myślą o bezpieczeństwie, przepływach opartych na rolach i obserwowalności.
 
-- [Overview](#overview)
-- [Architecture & Tech Stack](#architecture--tech-stack)
-- [Prerequisites](#prerequisites)
-- [Local setup (backend)](#local-setup-backend)
-- [Local setup (frontend)](#local-setup-frontend)
-- [Running with Docker Compose](#running-with-docker-compose)
-- [Environment variables](#environment-variables)
-- [Database and migrations](#database-and-migrations)
-- [Security & Best Practices](#security--best-practices)
-- [Testing](#testing)
-- [API Endpoints (summary)](#api-endpoints-summary)
-- [Roles and User Flows](#roles-and-user-flows)
-- [Logging & Monitoring](#logging--monitoring)
-- [Deployment notes (Azure / Docker)](#deployment-notes-azure--docker)
-- [Troubleshooting](#troubleshooting)
-- [Further improvements](#further-improvements)
+## Table of Contents / Spis treści
 
----
+- [Highlights / Najważniejsze możliwości](#highlights--najważniejsze-możliwo%C5%9Bci)
+- [Tech Stack / Stack technologiczny](#tech-stack--stack-technologiczny)
+- [Quick Start / Szybki start](#quick-start--szybki-start)
+- [Roles / Role i uprawnienia](#roles-and-responsibilities--role-i-uprawnienia)
+- [Demo / Demo](#demo--demo)
+- [Screenshots / Zrzuty ekranu](#screenshots--zrzuty-ekranu)
+- [API Overview / Przegląd API](#api-overview--przegl%C4%85d-api)
+- [Environment / Zmienne środowiskowe](#environment---zmienne-%C5%9Brodowiskowe)
+- [Docker Compose / Docker Compose](#docker-compose--docker-compose)
+- [Testing / Testowanie](#testing--testowanie)
+- [Security / Bezpieczeństwo](#security--bezpiecze%C5%84stwo)
+- [Troubleshooting / Rozwiązywanie problemów](#troubleshooting--rozwi%C4%85zywanie-problem%C3%B3w)
+- [Additional Docs / Dokumentacja uzupełniająca](#additional-documentation--dokumentacja-uzupe%C5%82niaj%C4%85ca)
+- [License / Licencja](#license--licencja)
 
-## Overview
 
-This project implements a role-based nursery management system. It supports:
+## Highlights / Najważniejsze możliwości
 
-- User registration and authentication (JWT)
-- Role-based access control (Admin, Parent, Caregiver)
-- Creating and listing children, groups and attendance records
-- Secure password storage (bcrypt)
-- Rate-limiting for auth endpoints
-- Frontend UI built with React + Ant Design
+- JWT authentication with access and refresh tokens / Uwierzytelnianie JWT z access i refresh tokenami
+- Role-based access for `ADMIN`, `PARENT`, `CAREGIVER` / Role i uprawnienia dla `ADMIN`, `PARENT`, `CAREGIVER`
+- Children, groups, parents, and caregivers management / Zarządzanie dziećmi, grupami, rodzicami i opiekunami
+- Attendance tracking and history / Ewidencja obecności i historia frekwencji
+- System announcements and email notifications / Ogłoszenia systemowe i powiadomienia e-mail
+- Internal messaging between users / Wiadomości wewnętrzne między użytkownikami
+- Validation, rate limiting, and secure cookies / Walidacja, rate limiting i bezpieczne cookies
+- Structured logging with Winston / Ustrukturyzowane logowanie przez Winston
 
-## Architecture & Tech Stack
+## Tech Stack / Stack technologiczny
 
 - Backend: NestJS, TypeScript, TypeORM, PostgreSQL
-- Frontend: React, TypeScript, Ant Design, Vite
-- Auth: JWT tokens, role-based guards
-- Logging: winston via nest-winston
-- Rate limiting: rate-limiter-flexible (Auth rate limiter service)
-- Password hashing: bcrypt
+- Frontend: React, TypeScript, Vite, Ant Design
+- Auth: JWT, guards, role-based access control
+- Security: bcrypt, helmet, httpOnly cookies
 
-## Prerequisites
+## Repository Structure / Struktura repozytorium
 
-- Node.js (LTS recommended)
-- npm or yarn
-- Docker & Docker Compose (recommended for production/local reproducible setup)
-- PostgreSQL (if running without Docker)
+- `backend/` - NestJS API application / Aplikacja API w NestJS
+- `frontend/` - React user interface / Interfejs użytkownika w React
+- `docker-compose.yml` - local backend + PostgreSQL setup / lokalne uruchomienie backendu i PostgreSQL
+- `README.md` - repository documentation / dokumentacja całego repozytorium
 
-## Local setup (backend)
+## Requirements / Wymagania
 
-1. Move to backend folder:
+- Node.js 18+ or newer / Node.js 18+ lub nowszy
+- npm 10+
+- PostgreSQL 13+
+- Docker and Docker Compose for containerized runs / Docker i Docker Compose do uruchomienia kontenerowego
+
+## Quick Start / Szybki start
+
+### 1. Clone the repository / Klonowanie repozytorium
+
+```bash
+git clone <repo-url>
+cd nursery-backend
+```
+
+### 2. Backend / Backend
 
 ```bash
 cd backend
-```
-
-2. Install dependencies:
-
-```bash
 npm install
 ```
 
-3. Create `.env` file in `backend/` with the required variables (see [Environment variables](#environment-variables)).
+Create `backend/.env` using your local configuration. Example:
 
-4. Build and run (development):
+Utwórz `backend/.env` zgodnie z własną konfiguracją. Przykład:
+
+```env
+NODE_ENV=development
+PORT=3000
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=user
+DATABASE_PASSWORD=password
+DATABASE_NAME=nursery
+JWT_ACCESS_SECRET=replace-with-secure-secret
+JWT_REFRESH_SECRET=replace-with-secure-secret
+```
+
+Start the backend:
+
+Uruchom backend:
 
 ```bash
-npm run build
 npm run start:dev
 ```
 
-## Local setup (frontend)
-
-1. Move to frontend folder:
+Useful backend scripts / Przydatne skrypty backendu:
 
 ```bash
-cd frontend
+npm run build
+npm run start
+npm run start:prod
+npm run test
+npm run test:e2e
+npm run typeorm:run
+npm run typeorm:revert
 ```
 
-2. Install dependencies:
+### 3. Frontend / Frontend
 
 ```bash
+cd ../frontend
 npm install
 ```
 
-3. Create `.env` in `frontend/` (if needed) with `VITE_API_URL` pointing to backend.
+Create `frontend/.env` / Utwórz `frontend/.env`:
 
-4. Start dev server:
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+Start the frontend:
+
+Uruchom frontend:
 
 ```bash
 npm run dev
 ```
 
-## Running with Docker Compose
-
-1. Ensure `docker` and `docker-compose` are installed.
-2. Create `backend/.env` and `frontend/.env` with proper values (see below).
-3. Use the provided `docker-compose.yml` (or create one like in project docs) and run:
+Useful frontend scripts / Przydatne skrypty frontendu:
 
 ```bash
-docker-compose up --build -d
+npm run build
+npm run lint
+npm run preview
 ```
 
-Access frontend (default) at `http://localhost:5173` and backend at `http://localhost:3000`.
+## Docker Compose / Docker Compose
 
-## Environment variables
+The root `docker-compose.yml` brings up PostgreSQL and the backend. Make sure environment variables are set before starting.
 
-Backend (.env) should include at least:
+Plik `docker-compose.yml` uruchamia PostgreSQL i backend. Przed startem upewnij się, że masz ustawione zmienne środowiskowe.
 
+```bash
+docker compose up --build
 ```
-DATABASE_URL=postgres://user:password@db:5432/nursery
-JWT_SECRET=replace_with_a_secure_secret
-NODE_ENV=production
+
+## Environment Variables / Zmienne środowiskowe
+
+### Backend / Backend
+
+Common variables / Najczęściej używane zmienne:
+
+```env
+NODE_ENV=development
 PORT=3000
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=user
+DATABASE_PASSWORD=password
+DATABASE_NAME=nursery
+JWT_ACCESS_SECRET=...
+JWT_REFRESH_SECRET=...
 ```
 
-Frontend (.env) (Vite):
+Depending on the deployment, SMTP settings and additional security values may also be required.
 
-```
+W zależności od wdrożenia mogą być też potrzebne ustawienia SMTP i dodatkowe parametry bezpieczeństwa.
+
+### Frontend / Frontend
+
+```env
 VITE_API_URL=http://localhost:3000
 ```
 
-## Database and migrations
+In the frontend code, this value is read as `import.meta.env.VITE_API_URL`.
 
-This project uses TypeORM. To run migrations (if present):
+W kodzie frontendu wartość ta jest odczytywana jako `import.meta.env.VITE_API_URL`.
+
+## Business Features / Funkcje biznesowe
+
+- user and role management / zarządzanie użytkownikami i rolami
+- assigning children to groups / przypisywanie dzieci do grup
+- attendance tracking / ewidencja obecności
+- announcements for all users or selected groups / ogłoszenia dla wszystkich lub wybranych grup
+- internal messaging / wiadomości wewnętrzne
+- email notifications / powiadomienia e-mail
+- audit logging / logowanie audytowe
+
+## Roles and Responsibilities / Role i uprawnienia
+
+### Administrator / Administrator
+
+Administrator has full access to the system and can manage every major area of the application:
+
+Administrator ma pełny dostęp do systemu i może zarządzać każdym kluczowym obszarem aplikacji:
+
+- create, edit, and delete users / tworzenie, edycja i usuwanie użytkowników
+- assign roles and change user permissions / przypisywanie ról i zmiana uprawnień użytkowników
+- manage children profiles and their assignments / zarządzanie profilami dzieci i ich przypisaniami
+- create and manage groups / tworzenie i zarządzanie grupami
+- assign caregivers to groups / przypisywanie opiekunów do grup
+- publish global and group-specific announcements / publikowanie ogłoszeń globalnych i grupowych
+- view and moderate messages and communication flows / przeglądanie i moderowanie wiadomości oraz komunikacji
+- access attendance data and system-wide history / dostęp do danych obecności i historii całego systemu
+- review audit logs and security-related events / przeglądanie logów audytowych i zdarzeń bezpieczeństwa
+- manage system configuration and operational settings / zarządzanie konfiguracją systemu i ustawieniami operacyjnymi
+
+### Parent / Rodzic
+
+Parent users can only access data connected with their own children and communication related to them:
+
+Użytkownik z rolą rodzica ma dostęp wyłącznie do danych powiązanych z własnymi dziećmi oraz komunikacji z nimi związanej:
+
+- view their own children profiles / przeglądanie profili własnych dzieci
+- see attendance history and daily presence information / przeglądanie historii obecności i bieżącej frekwencji
+- receive announcements related to their child’s group / odbieranie ogłoszeń związanych z grupą dziecka
+- send and receive messages with caregivers and administration / wysyłanie i odbieranie wiadomości od opiekunów i administracji
+- update selected personal account details where allowed / aktualizacja wybranych danych konta, jeśli jest to dozwolone
+- access notifications and system messages relevant to their child / dostęp do powiadomień i komunikatów dotyczących dziecka
+
+### Caregiver / Opiekun
+
+Caregivers work with assigned groups and children, with access limited to their scope of responsibility:
+
+Opiekun pracuje z przypisanymi grupami i dziećmi, a dostęp jest ograniczony do jego zakresu obowiązków:
+
+- view children assigned to their groups / przeglądanie dzieci przypisanych do swoich grup
+- track attendance for children in assigned groups / rejestrowanie obecności dzieci w przypisanych grupach
+- view group-related announcements and updates / przeglądanie ogłoszeń i aktualizacji dotyczących grup
+- communicate with parents and administrators / komunikacja z rodzicami i administracją
+- manage daily operational information for their groups / zarządzanie bieżącymi informacjami operacyjnymi dla grup
+- receive notifications about changes in assigned children or groups / otrzymywanie powiadomień o zmianach dotyczących przypisanych dzieci lub grup
+
+## Demo / Demo
+
+_Place your demo link here_ / _Wstaw tutaj link do demo_
+
+## Screenshots / Zrzuty ekranu
+
+_Add screenshots here_ / _Dodaj tutaj zrzuty ekranu_
+
+## API Overview / Przegląd API
+
+Main backend areas / Główne obszary backendu:
+
+- `/auth` - login, registration, token refresh, password reset / logowanie, rejestracja, odświeżanie tokenów, reset hasła
+- `/users` - user management / zarządzanie użytkownikami
+- `/children` - children and assignments / dzieci i przypisania
+- `/groups` - groups and caregiver assignments / grupy i przypisywanie opiekunów
+- `/attendance` - attendance and history / obecności i historia
+- `/announcements` - announcements / ogłoszenia
+- `/messages` - messages / wiadomości
+- `/parents` and `/caregivers` - profiles and relations / profile i relacje
+
+The full endpoint list is defined in the backend controllers.
+
+Pełna lista endpointów znajduje się w kontrolerach backendu.
+
+## Testing / Testowanie
+
+Backend:
 
 ```bash
-# from backend
-npm run typeorm migration:run
+cd backend
+npm run test
+npm run test:cov
+npm run lint
 ```
 
-If running without migrations, ensure the database schema is created either by TypeORM `synchronize` (not recommended in production) or by running SQL migrations.
+Frontend:
 
-## Security & Best Practices
+```bash
+cd frontend
+npm run lint
+npm run build
+```
 
-Key controls implemented in the project:
+## Security / Bezpieczeństwo
 
-- JWT-based authentication with token verification on backend guards
-- Role-Based Access Control (RBAC) via `RolesGuard` and `@Roles()` decorator
-- Password hashing using `bcrypt` (never store plaintext passwords)
-- Rate limiting on authentication endpoints (`AuthRateLimiterService`) to mitigate brute-force
-- Input validation at multiple layers:
-  - Frontend: Ant Design form `rules` (client-side)
-  - Backend: DTOs with `class-validator` (server-side)
-  - Database: column constraints and types (TypeORM/Postgres)
-- Logging of application events and errors via winston, saved to `logs/` (e.g. `logs/error.log`)
-- CORS and HTTPS must be enforced in production
+- JWT tokens stored in `httpOnly` cookies / tokeny JWT przechowywane w `httpOnly` cookies
+- input validation on backend and frontend / walidacja danych po stronie backendu i frontendu
+- password hashing with `bcrypt` / haszowanie haseł przez `bcrypt`
+- brute-force protection via rate limiting / ochrona przed brute force przez rate limiting
+- security headers via `helmet` / nagłówki bezpieczeństwa przez `helmet`
+- role and permission enforcement on the backend / egzekwowanie ról i uprawnień po stronie backendu
 
-Extra recommendations (not all implemented):
+## Troubleshooting / Rozwiązywanie problemów
 
-- Use Redis-backed rate limiter for production (distributed)
-- Enforce HTTPS via reverse proxy (Nginx or cloud provider)
-- Enable email verification and optional 2FA for admins
-- Monitor dependencies (`npm audit`, Snyk) and update regularly
+- If the backend does not start, check `backend/.env` and the PostgreSQL connection. / Jeśli backend nie startuje, sprawdź `backend/.env` i połączenie z PostgreSQL.
+- If the frontend cannot reach the API, check `VITE_API_URL`. / Jeśli frontend nie widzi API, sprawdź `VITE_API_URL`.
+- If TypeScript errors appear, run `npm run build` inside `backend/` and inspect the reported files. / Jeśli pojawiają się błędy TypeScript, uruchom `npm run build` w `backend/` i sprawdź wskazane pliki.
+- If Docker Compose fails, make sure ports `3000` and `5432` are free. / Jeśli Docker Compose nie działa, upewnij się, że porty `3000` i `5432` są wolne.
 
-## Testing
 
-- Backend unit & integration tests: Jest (run `npm run test` in backend)
-- E2E tests: Supertest/Cypress may be used for flows (example scripts in `test/`)
-- Security scans: run `npm audit` and consider Snyk/ZAP for vulnerability scanning
+## License / Licencja
 
-## API Endpoints (summary)
+The project is private and does not yet declare an OSS license.
 
-> NOTE: This is a high-level summary. See backend controllers for full details.
-
-- `POST /auth/register` — register a new user
-- `POST /auth/login` — login, returns `access_token`
-- `GET /children` — list children (role-dependent)
-- `POST /children` — create child (Parent role)
-- `GET /parents/children` — list children for logged-in parent (example)
-- `GET /groups` — list groups (admin)
-- Additional admin endpoints for managing users & groups
-
-All protected endpoints require `Authorization: Bearer <token>` header.
-
-## Roles and User Flows
-
-- `ADMIN` — manage users, groups, see all data
-- `PARENT` — add/view own children
-- `CAREGIVER` — view children in assigned group
-
-## Logging & Monitoring
-
-- Winston logger configured in `backend/src/logger/winston-logger.ts` writes to console and files `logs/error.log` and `logs/combined.log`.
-- Monitor logs and configure log rotation and secure storage for production.
-
-## Deployment notes (Azure / Docker)
-
-- Build docker images for backend and frontend and push to a registry.
-- Use Azure Web App for Containers or Azure Container Instances / AKS for scalable deployment.
-- Configure secrets in Azure Key Vault and inject them as environment variables.
-- Use Application Gateway or Nginx as reverse proxy and enable HTTPS.
-
-## Troubleshooting
-
-- 401 Unauthorized on API calls: verify token in `localStorage` and that it's sent in `Authorization` header.
-- 404 on `/children`: verify correct backend URL and CORS settings.
-- Rate limit errors on login: wait for block duration (configurable) or clear limiter in backend.
-- DB connection errors: ensure `DATABASE_URL` is correct and Postgres is reachable.
-
-## Further improvements
-
-- Redis-based rate-limiter for distributed environments
-- Email verification and password reset flows
-- Audit logs for critical actions
-- More comprehensive E2E and security tests
+Projekt jest prywatny i nie zawiera jeszcze deklaracji licencji OSS.
