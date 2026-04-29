@@ -2,9 +2,19 @@
 
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) ![Postgres](https://img.shields.io/badge/Postgres-336791?style=flat&logo=postgresql&logoColor=white)
 
-Deliver a safer, faster and more transparent childcare experience — a production-ready nursery management platform that combines a robust NestJS API with a modern React + Vite UI. Built with security, role-based workflows and observability in mind.
+## About This Project / O projekcie
 
-Dostarcz bezpieczne, szybkie i przejrzyste zarządzanie żłobkiem — gotowa do produkcji platforma łącząca stabilne API w NestJS z nowoczesnym interfejsem React + Vite. Zaprojektowana z myślą o bezpieczeństwie, przepływach opartych na rolach i obserwowalności.
+This is a full-stack childcare management system that demonstrates production-ready patterns in action. It solves a real problem — managing children, staff, attendance and communication in a nursery — while showcasing clean architecture, secure authentication, role-based access control, and scalable design patterns.
+
+To to pełny system zarządzania żłobkiem, który pokazuje production-ready wzorce w praktyce. Rozwiązuje realny problem — zarządzanie dziećmi, personelem, frekwencją i komunikacją — jednocześnie demonstrując czystą architekturę, bezpieczne uwierzytelnianie, kontrolę dostępu opartą na rolach i skalowalne wzorce projektowe.
+
+### Why This Stack? / Dlaczego ten stack?
+
+- **NestJS**: Scalable backend with TypeScript, dependency injection, and TypeORM for clean database access / Skalowalne API z TypeScript, dependency injection i TypeORM do czystego dostępu do danych
+- **React + Vite**: Fast, modern UI with Ant Design for polished, accessible components / Szybki, nowoczesny interfejs z Ant Design dla dopracowanych komponentów
+- **PostgreSQL**: Reliable relational storage for complex data (children, parents, groups, attendance history) / Niezawodna relacyjna baza danych dla złożonych danych (dzieci, rodzice, grupy, historia frekwencji)
+- **JWT + Role-Based Guards**: Secure authentication and authorization without external services / Bezpieczne uwierzytelnianie i autoryzacja bez zewnętrznych usług
+- **Docker Compose**: Single-command local setup — reproducible environment for any developer / Jednorazowe uruchomienie środowiska lokalnego — reprodukowalne dla każdego dewelopera
 
 ## Table of Contents / Spis treści
 
@@ -17,10 +27,8 @@ Dostarcz bezpieczne, szybkie i przejrzyste zarządzanie żłobkiem — gotowa do
 - [API Overview / Przegląd API](#api-overview--przegl%C4%85d-api)
 - [Environment / Zmienne środowiskowe](#environment---zmienne-%C5%9Brodowiskowe)
 - [Docker Compose / Docker Compose](#docker-compose--docker-compose)
-- [Testing / Testowanie](#testing--testowanie)
 - [Security / Bezpieczeństwo](#security--bezpiecze%C5%84stwo)
 - [Troubleshooting / Rozwiązywanie problemów](#troubleshooting--rozwi%C4%85zywanie-problem%C3%B3w)
-- [Additional Docs / Dokumentacja uzupełniająca](#additional-documentation--dokumentacja-uzupe%C5%82niaj%C4%85ca)
 - [License / Licencja](#license--licencja)
 
 
@@ -236,7 +244,7 @@ Opiekun pracuje z przypisanymi grupami i dziećmi, a dostęp jest ograniczony do
 
 ## Demo / Demo
 
-_Place your demo link here_ / _Wstaw tutaj link do demo_
+(https://www.youtube.com/watch?v=BZzBCshnm1U)
 
 ## Screenshots / Zrzuty ekranu
 
@@ -259,25 +267,6 @@ The full endpoint list is defined in the backend controllers.
 
 Pełna lista endpointów znajduje się w kontrolerach backendu.
 
-## Testing / Testowanie
-
-Backend:
-
-```bash
-cd backend
-npm run test
-npm run test:cov
-npm run lint
-```
-
-Frontend:
-
-```bash
-cd frontend
-npm run lint
-npm run build
-```
-
 ## Security / Bezpieczeństwo
 
 - JWT tokens stored in `httpOnly` cookies / tokeny JWT przechowywane w `httpOnly` cookies
@@ -293,10 +282,3 @@ npm run build
 - If the frontend cannot reach the API, check `VITE_API_URL`. / Jeśli frontend nie widzi API, sprawdź `VITE_API_URL`.
 - If TypeScript errors appear, run `npm run build` inside `backend/` and inspect the reported files. / Jeśli pojawiają się błędy TypeScript, uruchom `npm run build` w `backend/` i sprawdź wskazane pliki.
 - If Docker Compose fails, make sure ports `3000` and `5432` are free. / Jeśli Docker Compose nie działa, upewnij się, że porty `3000` i `5432` są wolne.
-
-
-## License / Licencja
-
-The project is private and does not yet declare an OSS license.
-
-Projekt jest prywatny i nie zawiera jeszcze deklaracji licencji OSS.

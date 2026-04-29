@@ -33,7 +33,6 @@ Profesjonalne **API Systemu Zarządzania Żłobkiem** zbudowane w NestJS, TypeSc
 - **Walidacja**: class-validator & class-transformer  
 - **Email**: Nodemailer do powiadomień
 - **Logowanie**: Integracja z Winston logger
-- **Testowanie**: Jest dla testów jednostkowych i E2E
 
 ## 🚀 Szybki Start
 
@@ -224,29 +223,6 @@ curl -X GET http://localhost:3000/children \
   -b cookies.txt
 ```
 
-## 🧪 Testowanie
-
-### Testy Jednostkowe
-```bash
-# Uruchom testy jednostkowe
-npm run test
-
-# Uruchom testy w trybie watch
-npm run test:watch
-
-# Generuj raport pokrycia
-npm run test:cov
-```
-
-### Testy End-to-End
-```bash
-# Uruchom testy E2E
-npm run test:e2e
-```
-
-### Pokrycie Testów
-Projekt dąży do >80% pokrycia testów we wszystkich modułach.
-
 ## 📁 Struktura Projektu
 
 ```
@@ -342,20 +318,6 @@ SMTP_HOST=produkcyjny-host-smtp
 ### Wsparcie Dockera
 Aplikacja zawiera wsparcie Dockera. Zobacz główny `docker-compose.yml` dla pełnej konfiguracji.
 
-## 🤝 Kontrybuowanie
-
-1. Forkuj repozytorium
-2. Utwórz branch funkcjonalności: `git checkout -b feature/nowa-funkcjonalosc`
-3. Commituj zmiany: `git commit -am 'Dodaj nową funkcjonalność'`
-4. Wyślij do brancha: `git push origin feature/nowa-funkcjonalosc`
-5. Wyślij Pull Request
-
-## 📝 Dokumentacja API
-
-Dla szczegółowej dokumentacji API włącznie ze schematami request/response, użyj narzędzi takich jak:
-- **Kolekcja Postman**: Zaimportuj kolekcję do testowania
-- **Swagger/OpenAPI**: (Może być dodane z `@nestjs/swagger`)
-
 ## 🆘 Rozwiązywanie Problemów
 
 ### Częste Problemy
@@ -374,14 +336,3 @@ Dla szczegółowej dokumentacji API włącznie ze schematami request/response, u
 - Upewnij się, że schemat bazy danych jest aktualny
 - Sprawdź pliki migracji pod kątem konfliktów
 - Sprawdź konfigurację TypeORM
-
-## 📞 Wsparcie
-
-Dla wsparcia technicznego i pytań:
-- Utwórz issue w repozytorium
-- Sprawdź istniejącą dokumentację
-- Przejrzyj logi błędów w katalogu `logs/`
-
----
-
-Zbudowane z ❤️ używając NestJS i TypeScript
