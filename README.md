@@ -13,7 +13,7 @@ This is a full-stack childcare management system that demonstrates production-re
 - **JWT + Role-Based Guards**: Secure authentication and authorization without external services
 - **Docker Compose**: Single-command local setup — reproducible environment for any developer
 
-## Table of Contents / Spis treści
+## Table of Contents
 
 - [Highlights](#highlights--najważniejsze-możliwo%C5%9Bci)
 - [Tech Stack](#tech-stack--stack-technologiczny)
