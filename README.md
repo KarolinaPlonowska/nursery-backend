@@ -5,14 +5,6 @@
 ## About This Project
 This is a full-stack childcare management system that demonstrates production-ready patterns in action. It solves a real problem — managing children, staff, attendance and communication in a nursery — while showcasing clean architecture, secure authentication, role-based access control, and scalable design patterns.
 
-### Why This Stack?
-
-- **NestJS**: Scalable backend with TypeScript, dependency injection, and TypeORM for clean database access
-- **React + Vite**: Fast, modern UI with Ant Design for polished, accessible components
-- **PostgreSQL**: Reliable relational storage for complex data (children, parents, groups, attendance history)
-- **JWT + Role-Based Guards**: Secure authentication and authorization without external services
-- **Docker Compose**: Single-command local setup — reproducible environment for any developer
-
 ## Table of Contents
 
 - [Highlights](#highlights--najważniejsze-możliwo%C5%9Bci)
@@ -46,6 +38,14 @@ This is a full-stack childcare management system that demonstrates production-re
 - Frontend: React, TypeScript, Vite, Ant Design
 - Auth: JWT, guards, role-based access control
 - Security: bcrypt, helmet, httpOnly cookies
+
+### Why This Stack?
+
+- **NestJS**: Scalable backend with TypeScript, dependency injection, and TypeORM for clean database access
+- **React + Vite**: Fast, modern UI with Ant Design for polished, accessible components
+- **PostgreSQL**: Reliable relational storage for complex data (children, parents, groups, attendance history)
+- **JWT + Role-Based Guards**: Secure authentication and authorization without external services
+- **Docker Compose**: Single-command local setup — reproducible environment for any developer
 
 ## Repository Structure
 
